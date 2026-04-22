@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useLang } from '@/lib/LangContext';
+import PageHero from '@/components/PageHero';
 
 export default function ContactPage() {
   const { t } = useLang();
@@ -20,39 +21,39 @@ export default function ContactPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // In production, send to a backend or form service (e.g. Formspree, Resend)
     setSubmitted(true);
   };
 
   return (
     <>
-      {/* Hero */}
-      <section className="bg-gradient-to-br from-blue-950 to-blue-800 text-white py-20">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">{t('contact.title')}</h1>
-          <p className="text-blue-200 text-lg">{t('contact.subtitle')}</p>
-        </div>
-      </section>
+      <PageHero
+        label="Join / Contact"
+        title={t('contact.title')}
+        subtitle={t('contact.subtitle')}
+      />
 
-      <section className="py-20 bg-gray-50">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6">
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-12">
+      <section className="py-24 bg-white">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-16">
             {/* Form */}
-            <div className="md:col-span-3">
-              <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100">
-                <h2 className="text-2xl font-bold text-blue-950 mb-6">{t('contact.join_title')}</h2>
-                <p className="text-gray-600 mb-6 leading-relaxed">{t('contact.join_text')}</p>
+            <div className="lg:col-span-7">
+              <p className="text-[10px] tracking-[0.25em] uppercase text-slate-400 font-medium mb-2">
+                {t('contact.join_title')}
+              </p>
+              <div className="w-6 h-px bg-slate-900 mb-8" />
+              <p className="text-slate-500 mb-10 leading-relaxed">{t('contact.join_text')}</p>
 
-                {submitted ? (
-                  <div className="bg-green-50 border border-green-200 rounded-xl p-6 text-center">
-                    <span className="text-4xl block mb-3">✅</span>
-                    <p className="text-green-800 font-medium">{t('contact.submit_success')}</p>
-                  </div>
-                ) : (
-                  <form onSubmit={handleSubmit} className="space-y-5">
+              {submitted ? (
+                <div className="border border-slate-200 p-10 text-center">
+                  <p className="text-[10px] tracking-widest uppercase text-slate-400 mb-3">Sent</p>
+                  <p className="text-slate-700 font-medium">{t('contact.submit_success')}</p>
+                </div>
+              ) : (
+                <form onSubmit={handleSubmit} className="space-y-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                        {t('contact.name_label')} <span className="text-red-500">*</span>
+                      <label className="block text-[11px] tracking-widest uppercase text-slate-400 font-medium mb-2">
+                        {t('contact.name_label')} <span className="text-slate-900">*</span>
                       </label>
                       <input
                         type="text"
@@ -61,12 +62,12 @@ export default function ContactPage() {
                         placeholder={t('contact.name_placeholder')}
                         value={form.name}
                         onChange={handleChange}
-                        className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all"
+                        className="w-full px-4 py-3 border border-slate-200 bg-white text-sm text-slate-900 placeholder-slate-300 focus:outline-none focus:border-slate-900 transition-colors"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                        {t('contact.email_label')} <span className="text-red-500">*</span>
+                      <label className="block text-[11px] tracking-widest uppercase text-slate-400 font-medium mb-2">
+                        {t('contact.email_label')} <span className="text-slate-900">*</span>
                       </label>
                       <input
                         type="email"
@@ -75,12 +76,14 @@ export default function ContactPage() {
                         placeholder={t('contact.email_placeholder')}
                         value={form.email}
                         onChange={handleChange}
-                        className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all"
+                        className="w-full px-4 py-3 border border-slate-200 bg-white text-sm text-slate-900 placeholder-slate-300 focus:outline-none focus:border-slate-900 transition-colors"
                       />
                     </div>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                        {t('contact.university_label')} <span className="text-red-500">*</span>
+                      <label className="block text-[11px] tracking-widest uppercase text-slate-400 font-medium mb-2">
+                        {t('contact.university_label')} <span className="text-slate-900">*</span>
                       </label>
                       <input
                         type="text"
@@ -89,11 +92,11 @@ export default function ContactPage() {
                         placeholder={t('contact.university_placeholder')}
                         value={form.university}
                         onChange={handleChange}
-                        className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all"
+                        className="w-full px-4 py-3 border border-slate-200 bg-white text-sm text-slate-900 placeholder-slate-300 focus:outline-none focus:border-slate-900 transition-colors"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                      <label className="block text-[11px] tracking-widest uppercase text-slate-400 font-medium mb-2">
                         {t('contact.year_label')}
                       </label>
                       <input
@@ -102,63 +105,67 @@ export default function ContactPage() {
                         placeholder={t('contact.year_placeholder')}
                         value={form.year}
                         onChange={handleChange}
-                        className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all"
+                        className="w-full px-4 py-3 border border-slate-200 bg-white text-sm text-slate-900 placeholder-slate-300 focus:outline-none focus:border-slate-900 transition-colors"
                       />
                     </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                        {t('contact.message_label')}
-                      </label>
-                      <textarea
-                        name="message"
-                        rows={4}
-                        placeholder={t('contact.message_placeholder')}
-                        value={form.message}
-                        onChange={handleChange}
-                        className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all resize-none"
-                      />
-                    </div>
-                    <button
-                      type="submit"
-                      className="w-full py-3 bg-blue-700 hover:bg-blue-800 text-white font-semibold rounded-xl transition-colors text-base"
-                    >
-                      {t('contact.submit')}
-                    </button>
-                  </form>
-                )}
-              </div>
+                  </div>
+                  <div>
+                    <label className="block text-[11px] tracking-widest uppercase text-slate-400 font-medium mb-2">
+                      {t('contact.message_label')}
+                    </label>
+                    <textarea
+                      name="message"
+                      rows={5}
+                      placeholder={t('contact.message_placeholder')}
+                      value={form.message}
+                      onChange={handleChange}
+                      className="w-full px-4 py-3 border border-slate-200 bg-white text-sm text-slate-900 placeholder-slate-300 focus:outline-none focus:border-slate-900 transition-colors resize-none"
+                    />
+                  </div>
+                  <button
+                    type="submit"
+                    className="w-full py-4 bg-slate-900 hover:bg-slate-700 text-white text-[12px] tracking-widest uppercase font-bold transition-colors"
+                  >
+                    {t('contact.submit')} →
+                  </button>
+                </form>
+              )}
             </div>
 
-            {/* Sidebar info */}
-            <div className="md:col-span-2 space-y-6">
-              <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-                <h3 className="font-bold text-blue-950 mb-3">{t('contact.inquiry_title')}</h3>
-                <p className="text-sm text-gray-600 leading-relaxed mb-4">{t('contact.inquiry_text')}</p>
+            {/* Sidebar */}
+            <div className="lg:col-span-5 space-y-8">
+              <div>
+                <p className="text-[10px] tracking-[0.25em] uppercase text-slate-400 font-medium mb-2">
+                  {t('contact.inquiry_title')}
+                </p>
+                <div className="w-6 h-px bg-slate-900 mb-6" />
+                <p className="text-slate-500 text-sm leading-relaxed mb-4">{t('contact.inquiry_text')}</p>
                 <a
                   href="mailto:moriyankoyuto0430@gmail.com"
-                  className="text-sm text-blue-600 hover:text-blue-800 font-medium flex items-center gap-2"
+                  className="text-sm font-medium text-slate-900 border-b border-slate-200 pb-0.5 hover:border-slate-900 transition-colors"
                 >
-                  <span>✉️</span>
                   moriyankoyuto0430@gmail.com
                 </a>
               </div>
 
-              <div className="bg-blue-50 rounded-2xl p-6 border border-blue-100">
-                <h3 className="font-bold text-blue-950 mb-3">PSMA</h3>
-                <ul className="text-sm text-gray-600 space-y-2">
-                  <li className="flex items-center gap-2">
-                    <span>📅</span>
-                    <span>2024年設立 / Founded 2024</span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <span>📍</span>
-                    <span>東京・全国 / Tokyo & Nationwide</span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <span>🎓</span>
-                    <span>医学生・研修医歓迎 / Open to all medical students & residents</span>
-                  </li>
-                </ul>
+              <div className="border border-slate-100 p-8">
+                <p className="text-[10px] tracking-[0.25em] uppercase text-slate-400 font-medium mb-6">
+                  PSMA Info
+                </p>
+                <dl className="space-y-4">
+                  {[
+                    { label: 'Founded', value: '2024' },
+                    { label: 'Location', value: 'Tokyo, Japan' },
+                    { label: 'Open to', value: 'Medical students & residents' },
+                  ].map((item) => (
+                    <div key={item.label} className="flex gap-4">
+                      <dt className="text-[10px] tracking-widest uppercase text-slate-400 w-20 shrink-0 pt-0.5 font-medium">
+                        {item.label}
+                      </dt>
+                      <dd className="text-sm text-slate-700 font-medium">{item.value}</dd>
+                    </div>
+                  ))}
+                </dl>
               </div>
             </div>
           </div>

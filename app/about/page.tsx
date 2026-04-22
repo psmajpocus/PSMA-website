@@ -2,71 +2,81 @@
 
 import { useLang } from '@/lib/LangContext';
 import Link from 'next/link';
+import PageHero from '@/components/PageHero';
 
 export default function AboutPage() {
-  const { t } = useLang();
+  const { t, lang } = useLang();
 
   return (
     <>
-      {/* Hero */}
-      <section className="bg-gradient-to-br from-blue-950 to-blue-800 text-white py-20">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">{t('about.title')}</h1>
-          <p className="text-blue-200 text-lg">POCUS Students and Residents Medical Alliance</p>
-        </div>
-      </section>
+      <PageHero
+        label="About PSMA"
+        title={t('about.title')}
+        subtitle="POCUS Students and Residents Medical Alliance"
+      />
 
       {/* Mission & Vision */}
-      <section className="py-20 bg-white">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-            <div className="bg-blue-50 rounded-2xl p-8">
-              <div className="w-12 h-12 bg-blue-700 rounded-xl flex items-center justify-center mb-6">
-                <span className="text-white text-xl">🎯</span>
-              </div>
-              <h2 className="text-2xl font-bold text-blue-950 mb-4">{t('about.mission_title')}</h2>
-              <p className="text-gray-700 leading-relaxed text-lg">{t('about.mission_text')}</p>
+      <section className="py-24 bg-white">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-px bg-slate-100">
+            <div className="bg-white p-10 lg:p-14">
+              <p className="text-[10px] tracking-[0.25em] uppercase text-slate-400 font-medium mb-6">
+                01 — {t('about.mission_title')}
+              </p>
+              <p className="text-xl lg:text-2xl text-slate-900 leading-relaxed font-medium">
+                {t('about.mission_text')}
+              </p>
             </div>
-            <div className="bg-cyan-50 rounded-2xl p-8">
-              <div className="w-12 h-12 bg-cyan-700 rounded-xl flex items-center justify-center mb-6">
-                <span className="text-white text-xl">🔭</span>
-              </div>
-              <h2 className="text-2xl font-bold text-blue-950 mb-4">{t('about.vision_title')}</h2>
-              <p className="text-gray-700 leading-relaxed text-lg">{t('about.vision_text')}</p>
+            <div className="bg-white p-10 lg:p-14">
+              <p className="text-[10px] tracking-[0.25em] uppercase text-slate-400 font-medium mb-6">
+                02 — {t('about.vision_title')}
+              </p>
+              <p className="text-xl lg:text-2xl text-slate-900 leading-relaxed font-medium">
+                {t('about.vision_text')}
+              </p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Our Story */}
-      <section className="py-20 bg-gray-50">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6">
-          <h2 className="text-3xl font-bold text-blue-950 mb-6">{t('about.history_title')}</h2>
-          <div className="w-12 h-1 bg-blue-600 mb-8 rounded-full" />
-          <p className="text-gray-700 leading-relaxed text-lg mb-8">{t('about.history_text')}</p>
-
-          <div className="flex flex-wrap gap-4">
-            <div className="bg-white border border-blue-100 rounded-xl px-5 py-3 flex items-center gap-3 shadow-sm">
-              <span className="text-blue-600 text-lg">📅</span>
-              <span className="font-medium text-blue-950">{t('about.founding_year')}</span>
+      {/* Story */}
+      <section className="py-24 bg-slate-50">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16">
+            <div className="lg:col-span-3">
+              <p className="text-[10px] tracking-[0.25em] uppercase text-slate-400 font-medium mb-2">
+                {t('about.history_title')}
+              </p>
+              <div className="w-6 h-px bg-slate-900" />
             </div>
-            <div className="bg-white border border-blue-100 rounded-xl px-5 py-3 flex items-center gap-3 shadow-sm">
-              <span className="text-blue-600 text-lg">📍</span>
-              <span className="font-medium text-blue-950">{t('about.location')}</span>
+            <div className="lg:col-span-7">
+              <p className="text-slate-600 text-lg leading-relaxed mb-10">
+                {t('about.history_text')}
+              </p>
+              <div className="flex flex-wrap gap-4">
+                <div className="border border-slate-200 px-5 py-3">
+                  <p className="text-[10px] tracking-widest uppercase text-slate-400 mb-1">Founded</p>
+                  <p className="text-sm font-bold text-slate-900">{t('about.founding_year')}</p>
+                </div>
+                <div className="border border-slate-200 px-5 py-3">
+                  <p className="text-[10px] tracking-widest uppercase text-slate-400 mb-1">Location</p>
+                  <p className="text-sm font-bold text-slate-900">{t('about.location')}</p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-blue-950 text-white">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col md:flex-row items-center justify-between gap-6">
-          <p className="text-xl font-semibold">{t('members.join_cta')}</p>
+      <section className="py-20 bg-slate-950 text-white">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-8">
+          <p className="text-2xl font-bold">{t('members.join_cta')}</p>
           <Link
             href="/contact"
-            className="px-6 py-3 bg-white text-blue-900 font-semibold rounded-xl hover:bg-blue-50 transition-colors shrink-0"
+            className="inline-flex items-center gap-2 bg-white text-slate-900 text-[12px] tracking-widest uppercase font-bold px-6 py-3.5 hover:bg-slate-100 transition-colors shrink-0"
           >
-            {t('members.join_button')}
+            {t('members.join_button')} →
           </Link>
         </div>
       </section>

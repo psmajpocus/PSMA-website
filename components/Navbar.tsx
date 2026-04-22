@@ -9,7 +9,6 @@ export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
 
   const navLinks = [
-    { href: '/', label: t('nav.home') },
     { href: '/about', label: t('nav.about') },
     { href: '/activities', label: t('nav.activities') },
     { href: '/articles', label: t('nav.articles') },
@@ -18,48 +17,50 @@ export default function Navbar() {
   ];
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-sm border-b border-gray-100 shadow-sm">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6">
-        <div className="flex items-center justify-between h-16">
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-100">
+      <div className="max-w-7xl mx-auto px-6 lg:px-8">
+        <div className="flex items-center justify-between h-14">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-blue-700 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-sm">P</span>
-            </div>
-            <span className="font-bold text-blue-900 text-lg tracking-tight">PSMA</span>
+          <Link href="/" className="flex items-center gap-3 group">
+            <span className="text-[11px] font-bold tracking-[0.2em] text-white bg-slate-900 px-2 py-1">
+              PSMA
+            </span>
+            <span className="hidden sm:block text-[11px] tracking-widest text-slate-400 font-medium uppercase">
+              POCUS Medical Alliance
+            </span>
           </Link>
 
           {/* Desktop nav */}
-          <div className="hidden md:flex items-center gap-1">
+          <div className="hidden md:flex items-center gap-8">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
-                className="px-3 py-2 text-sm text-gray-600 hover:text-blue-700 hover:bg-blue-50 rounded-md transition-colors"
+                className="text-[12px] tracking-widest uppercase text-slate-500 hover:text-slate-900 transition-colors font-medium"
               >
                 {link.label}
               </Link>
             ))}
           </div>
 
-          {/* Language toggle + mobile menu */}
-          <div className="flex items-center gap-2">
+          {/* Lang toggle + mobile */}
+          <div className="flex items-center gap-4">
             <button
               onClick={toggleLang}
-              className="px-3 py-1.5 text-xs font-medium border border-blue-200 text-blue-700 rounded-full hover:bg-blue-50 transition-colors"
+              className="text-[11px] tracking-widest uppercase text-slate-400 hover:text-slate-900 transition-colors font-medium"
             >
               {lang === 'ja' ? 'EN' : 'JP'}
             </button>
             <button
-              className="md:hidden p-2 text-gray-500 hover:text-blue-700 transition-colors"
+              className="md:hidden text-slate-500 hover:text-slate-900 transition-colors"
               onClick={() => setMenuOpen(!menuOpen)}
               aria-label="Toggle menu"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 {menuOpen ? (
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 18L18 6M6 6l12 12" />
                 ) : (
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 6h16M4 12h16M4 18h16" />
                 )}
               </svg>
             </button>
@@ -68,12 +69,12 @@ export default function Navbar() {
 
         {/* Mobile menu */}
         {menuOpen && (
-          <div className="md:hidden py-3 border-t border-gray-100">
+          <div className="md:hidden border-t border-gray-100 py-4">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
-                className="block px-4 py-2.5 text-sm text-gray-600 hover:text-blue-700 hover:bg-blue-50 transition-colors"
+                className="block py-3 text-[12px] tracking-widest uppercase text-slate-500 hover:text-slate-900 transition-colors font-medium"
                 onClick={() => setMenuOpen(false)}
               >
                 {link.label}
