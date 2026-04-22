@@ -1,0 +1,103 @@
+{
+  "nav": {
+    "home": "Home",
+    "about": "About",
+    "activities": "Activities",
+    "articles": "Articles",
+    "members": "Members",
+    "contact": "Join / Contact"
+  },
+  "home": {
+    "hero_title": "Connecting Medical Students Through POCUS.",
+    "hero_subtitle": "POCUS Students and Residents Medical Alliance",
+    "hero_description": "A learning community for medical students and residents centered on Point-of-Care Ultrasound. Break through university barriers — learn and grow together.",
+    "cta_join": "Join PSMA",
+    "cta_learn": "About PSMA",
+    "about_title": "What is PSMA?",
+    "about_text": "POCUS Students and Residents Medical Alliance (PSMA) is a community where medical students and residents across Japan can learn and connect around POCUS. We break down barriers between universities to build ultrasound skills that matter at the bedside.",
+    "features_title": "What PSMA Offers",
+    "feature_1_title": "Hands-On Seminars",
+    "feature_1_text": "Regular hands-on seminars where you can learn probe technique, from fundamentals to clinical applications. Open to all levels.",
+    "feature_2_title": "Cross-University Networking",
+    "feature_2_text": "Connect with medical students nationwide for information sharing and collaborative learning opportunities.",
+    "feature_3_title": "Expert Interviews",
+    "feature_3_text": "In-depth interviews with POCUS faculty and senior residents, giving you access to frontline knowledge and perspectives.",
+    "recent_articles": "Recent Articles",
+    "view_all": "View All"
+  },
+  "about": {
+    "title": "About PSMA",
+    "mission_title": "Mission",
+    "mission_text": "To create an environment where medical students and residents across Japan can learn POCUS, contributing to the skill development of the next generation of clinicians.",
+    "vision_title": "Vision",
+    "vision_text": "Toward a future where POCUS is standard in medical education. PSMA aims to be the pioneering community leading that change.",
+    "history_title": "Our Story",
+    "history_text": "Founded in 2024 in response to limited POCUS learning opportunities for medical students. Today, students and residents from multiple universities participate in our growing community.",
+    "founding_year": "Founded 2024",
+    "location": "Base: Tokyo / Nationwide"
+  },
+  "activities": {
+    "title": "Activities & Events",
+    "subtitle": "Discover what PSMA does",
+    "seminar_title": "Hands-On Seminars",
+    "seminar_text": "We regularly host hands-on POCUS seminars where participants can practice with actual probes, covering fundamentals through clinical applications.",
+    "workshop_title": "Online Workshops",
+    "workshop_text": "Online study sessions accessible from anywhere in Japan — case presentations, image interpretation practice, and skills sharing.",
+    "conference_title": "Conference Participation & Reports",
+    "conference_text": "We attend and report on POCUS-related conferences in Japan and abroad, sharing the latest developments with our community.",
+    "upcoming_title": "Upcoming Events",
+    "upcoming_empty": "Events are being planned. Follow our social media for the latest updates.",
+    "past_title": "Past Activities"
+  },
+  "articles": {
+    "title": "Featured Articles",
+    "subtitle": "Interviews, conference reports, and learning insights on POCUS",
+    "category_interview": "Interview",
+    "category_report": "Conference Report",
+    "category_tips": "Learning Tips",
+    "category_news": "News",
+    "read_more": "Read More",
+    "coming_soon": "Articles coming soon. Stay tuned!"
+  },
+  "members": {
+    "title": "Our Members",
+    "subtitle": "The students and residents who run PSMA",
+    "role_president": "President",
+    "role_vice": "Vice President",
+    "role_member": "Member",
+    "join_cta": "Want to join PSMA?",
+    "join_button": "Apply to Join"
+  },
+  "contact": {
+    "title": "Join / Contact",
+    "subtitle": "Interested in PSMA? We'd love to hear from you.",
+    "join_title": "Join PSMA",
+    "join_text": "Any medical student or resident is welcome to join. Please fill out the form below.",
+    "name_label": "Full Name",
+    "name_placeholder": "Taro Yamada",
+    "email_label": "Email Address",
+    "email_placeholder": "your@email.com",
+    "university_label": "University / Hospital",
+    "university_placeholder": "e.g. Hamamatsu University School of Medicine",
+    "year_label": "Year / Level",
+    "year_placeholder": "e.g. 4th year medical student, PGY-1",
+    "message_label": "Message / Questions (optional)",
+    "message_placeholder": "Any questions about PSMA or your motivation to join",
+    "submit": "Submit",
+    "submit_success": "Your message has been sent. We will be in touch shortly.",
+    "inquiry_title": "General Inquiries",
+    "inquiry_text": "For general inquiries about PSMA, please reach out via email.",
+    "email_contact": "Contact by Email"
+  },
+  "footer": {
+    "description": "A POCUS learning community for medical students and residents across Japan",
+    "links_title": "Links",
+    "contact_title": "Contact",
+    "rights": "All rights reserved."
+  },
+  "common": {
+    "loading": "Loading...",
+    "back": "Back",
+    "lang_toggle": "日本語"
+  }
+}

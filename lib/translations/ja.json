@@ -1,0 +1,103 @@
+{
+  "nav": {
+    "home": "ホーム",
+    "about": "団体紹介",
+    "activities": "活動・イベント",
+    "articles": "特集記事",
+    "members": "メンバー",
+    "contact": "参加・お問い合わせ"
+  },
+  "home": {
+    "hero_title": "POCUSで、医学生をつなぐ。",
+    "hero_subtitle": "POCUS Students and Residents Medical Alliance",
+    "hero_description": "医学生・研修医のためのPOCUS（ポイント・オブ・ケア超音波）学習コミュニティ。大学の壁を超えて、ともに学び、ともに成長する。",
+    "cta_join": "参加を申し込む",
+    "cta_learn": "PSMAについて",
+    "about_title": "PSMAとは",
+    "about_text": "POCUS Students and Residents Medical Alliance（PSMA）は、日本全国の医学生・初期研修医がPOCUSを学び、交流できるコミュニティです。大学間の壁を取り除き、臨床現場で役立つ超音波スキルを一緒に磨きましょう。",
+    "features_title": "PSMAでできること",
+    "feature_1_title": "ハンズオン勉強会",
+    "feature_1_text": "実際にプローブを使ったハンズオンセミナーを定期開催。初心者から経験者まで参加できます。",
+    "feature_2_title": "大学間交流",
+    "feature_2_text": "全国の医学生とつながり、情報共有や共同学習の機会を得られます。",
+    "feature_3_title": "専門家インタビュー",
+    "feature_3_text": "POCUS指導医や先輩研修医へのインタビュー記事を掲載。最前線の知識にアクセスできます。",
+    "recent_articles": "最新記事",
+    "view_all": "すべて見る"
+  },
+  "about": {
+    "title": "団体紹介",
+    "mission_title": "ミッション",
+    "mission_text": "日本全国の医学生・研修医がPOCUSを学べる環境を作り、次世代の臨床医のスキル向上に貢献する。",
+    "vision_title": "ビジョン",
+    "vision_text": "POCUSが医学教育の標準となる未来へ。PSMAはその先駆けとなるコミュニティを目指します。",
+    "history_title": "設立の背景",
+    "history_text": "2024年、医学生によるPOCUS学習の機会が限られているという課題から、学生主体の学習コミュニティとして設立。現在は複数大学の医学生・研修医が参加しています。",
+    "founding_year": "2024年設立",
+    "location": "拠点: 東京・全国"
+  },
+  "activities": {
+    "title": "活動・イベント",
+    "subtitle": "PSMAの主な活動内容をご紹介します",
+    "seminar_title": "ハンズオンセミナー",
+    "seminar_text": "定期的にPOCUSハンズオンセミナーを開催しています。実際にプローブを使って、エコーの基礎から臨床応用まで学べます。",
+    "workshop_title": "オンラインワークショップ",
+    "workshop_text": "全国どこからでも参加できるオンライン勉強会。症例発表・読影練習・技術共有など多彩なプログラム。",
+    "conference_title": "学会参加・レポート",
+    "conference_text": "国内外のPOCUS関連学会への参加・レポートを通じて、最新トレンドを発信しています。",
+    "upcoming_title": "直近のイベント",
+    "upcoming_empty": "現在準備中のイベントです。SNSで最新情報をチェックしてください。",
+    "past_title": "過去の活動"
+  },
+  "articles": {
+    "title": "特集記事",
+    "subtitle": "POCUSに関するインタビュー・学会レポート・学習情報を発信しています",
+    "category_interview": "インタビュー",
+    "category_report": "学会レポート",
+    "category_tips": "学習Tips",
+    "category_news": "お知らせ",
+    "read_more": "続きを読む",
+    "coming_soon": "記事を準備中です。お楽しみに！"
+  },
+  "members": {
+    "title": "メンバー紹介",
+    "subtitle": "PSMAを運営する学生・研修医メンバーです",
+    "role_president": "代表",
+    "role_vice": "副代表",
+    "role_member": "メンバー",
+    "join_cta": "あなたもPSMAに参加しませんか？",
+    "join_button": "参加申し込みへ"
+  },
+  "contact": {
+    "title": "参加・お問い合わせ",
+    "subtitle": "PSMAに興味をお持ちの方は、お気軽にご連絡ください",
+    "join_title": "PSMAに参加する",
+    "join_text": "医学生・研修医であれば誰でも参加できます。以下のフォームからお申し込みください。",
+    "name_label": "お名前",
+    "name_placeholder": "山田 太郎",
+    "email_label": "メールアドレス",
+    "email_placeholder": "your@email.com",
+    "university_label": "大学・病院名",
+    "university_placeholder": "○○大学医学部",
+    "year_label": "学年・年次",
+    "year_placeholder": "例: 医学部4年、初期研修1年目",
+    "message_label": "メッセージ・質問（任意）",
+    "message_placeholder": "PSMAへの質問や参加動機など",
+    "submit": "送信する",
+    "submit_success": "送信が完了しました。担当者よりご連絡いたします。",
+    "inquiry_title": "お問い合わせ",
+    "inquiry_text": "団体に関するお問い合わせは下記よりお願いします。",
+    "email_contact": "メールでのお問い合わせ"
+  },
+  "footer": {
+    "description": "日本全国の医学生・研修医によるPOCUS学習コミュニティ",
+    "links_title": "リンク",
+    "contact_title": "お問い合わせ",
+    "rights": "All rights reserved."
+  },
+  "common": {
+    "loading": "読み込み中...",
+    "back": "戻る",
+    "lang_toggle": "English"
+  }
+}
