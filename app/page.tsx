@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useLang } from '@/lib/LangContext';
+import HeroSlideshow from '@/components/HeroSlideshow';
 
 const sampleArticles = [
   {
@@ -50,64 +51,8 @@ export default function Home() {
 
   return (
     <>
-      {/* ── Hero ───────────────────────────────────────────────── */}
-      <section className="relative bg-slate-950 text-white min-h-[90vh] flex flex-col justify-end overflow-hidden">
-        {/* Background grid */}
-        <div
-          className="absolute inset-0 opacity-[0.06]"
-          style={{
-            backgroundImage:
-              'repeating-linear-gradient(0deg, #fff 0 1px, transparent 1px 60px), repeating-linear-gradient(90deg, #fff 0 1px, transparent 1px 60px)',
-          }}
-        />
-
-        {/* Top label */}
-        <div className="relative max-w-7xl mx-auto px-6 lg:px-8 w-full pt-24">
-          <p className="text-[10px] tracking-[0.3em] uppercase text-slate-500 font-medium mb-8">
-            POCUS Students and Residents Medical Alliance — Est. 2024
-          </p>
-        </div>
-
-        {/* Main heading */}
-        <div className="relative max-w-7xl mx-auto px-6 lg:px-8 w-full pb-20">
-          <h1 className="text-6xl sm:text-7xl lg:text-[96px] font-bold leading-[1.0] tracking-tight mb-10">
-            {lang === 'ja' ? (
-              <>
-                POCUSで、<br />
-                <span className="text-slate-300">医学生をつなぐ。</span>
-              </>
-            ) : (
-              <>
-                Connecting<br />
-                <span className="text-slate-300">Medical Students</span><br />
-                Through POCUS.
-              </>
-            )}
-          </h1>
-
-          <p className="text-slate-400 text-base lg:text-lg max-w-xl leading-relaxed mb-12">
-            {t('home.hero_description')}
-          </p>
-
-          <div className="flex flex-wrap items-center gap-4">
-            <Link
-              href="/contact"
-              className="inline-flex items-center gap-2 bg-white text-slate-900 text-[12px] tracking-widest uppercase font-bold px-6 py-3.5 hover:bg-slate-100 transition-colors"
-            >
-              {t('home.cta_join')} →
-            </Link>
-            <Link
-              href="/about"
-              className="inline-flex items-center gap-2 border border-slate-700 text-slate-300 text-[12px] tracking-widest uppercase font-bold px-6 py-3.5 hover:border-slate-400 hover:text-white transition-colors"
-            >
-              {t('home.cta_learn')}
-            </Link>
-          </div>
-        </div>
-
-        {/* Bottom divider */}
-        <div className="absolute bottom-0 left-0 right-0 h-px bg-slate-800" />
-      </section>
+      {/* ── Hero Slideshow ─────────────────────────────────────── */}
+      <HeroSlideshow />
 
       {/* ── About strip ─────────────────────────────────────────── */}
       <section className="py-24 bg-white">
