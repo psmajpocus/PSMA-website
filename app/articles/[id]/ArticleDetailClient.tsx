@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useLang } from '@/lib/LangContext';
+import ArticleEngagement from '@/components/ArticleEngagement';
 import type { Article } from '@/lib/microcms';
 
 const CATEGORY_LABELS: Record<string, { ja: string; en: string }> = {
@@ -68,6 +69,9 @@ export default function ArticleDetailClient({ article }: { article: Article }) {
           dangerouslySetInnerHTML={{ __html: body }}
         />
       </article>
+
+      {/* いいね・コメント */}
+      <ArticleEngagement articleId={article.id} />
 
       {/* 戻るリンク */}
       <div className="max-w-2xl mx-auto px-6 lg:px-8 pb-24 border-t border-slate-100 pt-8">
