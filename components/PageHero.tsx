@@ -17,7 +17,7 @@ export default function PageHero({ label, title, subtitle }: PageHeroProps) {
           {title}
         </h1>
         {subtitle && (
-          <p className="text-slate-400 text-lg max-w-xl leading-relaxed mt-4">{subtitle}</p>
+          <p className="text-slate-400 text-lg leading-relaxed mt-4 whitespace-nowrap">{subtitle}</p>
         )}
       </div>
     </section>

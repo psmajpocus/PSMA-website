@@ -13,7 +13,7 @@ import { useLang } from '@/lib/LangContext';
 */
 const slides = [
   {
-    imageSrc: null,
+    imageSrc: '/images/slide-hands-on-v2.jpg',
     gradient: 'from-slate-800 via-blue-900 to-slate-900',
     label_ja: 'ハンズオンセミナー',
     label_en: 'Hands-On Seminar',
@@ -21,7 +21,7 @@ const slides = [
     desc_en: 'Hands-on POCUS training with real probes',
   },
   {
-    imageSrc: null,
+    imageSrc: '/images/slide-online.jpg',
     gradient: 'from-blue-950 via-cyan-900 to-blue-900',
     label_ja: 'オンライン勉強会',
     label_en: 'Online Study Sessions',
@@ -29,7 +29,7 @@ const slides = [
     desc_en: 'Connecting medical students nationwide',
   },
   {
-    imageSrc: null,
+    imageSrc: '/images/slide-conference.jpg',
     gradient: 'from-slate-900 via-slate-700 to-blue-950',
     label_ja: '学会・カンファレンス参加',
     label_en: 'Conferences & Events',
@@ -37,12 +37,20 @@ const slides = [
     desc_en: 'At the frontline of POCUS education',
   },
   {
-    imageSrc: null,
+    imageSrc: '/images/slide-exchange.jpg',
     gradient: 'from-cyan-950 via-blue-900 to-slate-800',
     label_ja: '大学間交流',
     label_en: 'Inter-University Exchange',
     desc_ja: '大学の壁を越えたコミュニティ',
     desc_en: 'A community beyond university borders',
+  },
+  {
+    imageSrc: '/images/slide-spl.jpg',
+    gradient: 'from-slate-900 via-blue-950 to-slate-800',
+    label_ja: 'Student POCUS Leagueの運営',
+    label_en: 'Student POCUS League',
+    desc_ja: '日本唯一、最大規模の全国学生エコー大会',
+    desc_en: 'Japan\'s only and largest national student POCUS competition',
   },
 ];
 
@@ -64,36 +72,39 @@ export default function HeroSlideshow() {
   }, [next]);
 
   return (
-    <section className="flex flex-col md:flex-row w-full min-h-[72vh]">
+    <section className="flex flex-col md:flex-row w-full min-h-[72vh] shadow-[0_8px_32px_rgba(0,0,0,0.10)] relative z-10">
 
       {/* ── 左パネル: テキスト ─────────────────────── */}
-      <div className="md:w-[38%] bg-white flex flex-col justify-center px-10 lg:px-16 py-16 md:py-0 border-r border-gray-100">
+      <div className="md:w-[38%] bg-white flex flex-col justify-center items-center text-center px-10 lg:px-16 py-16 md:py-0 border-r border-gray-100">
         <p className="text-[10px] tracking-[0.3em] uppercase text-slate-400 font-medium mb-8">
           POCUS Students and Residents Medical Alliance
         </p>
 
-        <h1 className="text-3xl lg:text-[2.6rem] font-bold text-slate-900 leading-[1.15] tracking-tight mb-6">
+        <h1 className="text-[2.4rem] md:text-[2rem] lg:text-[3.25rem] font-bold text-slate-900 leading-[1.15] tracking-tight mb-6 break-words">
           {lang === 'ja' ? (
-            <>POCUSで、<br />医学生をつなぐ。</>
+            <>POCUSで<br />未来の医療者をつなぐ</>
           ) : (
-            <>Connecting<br />Medical Students<br />Through POCUS.</>
+            <>Connecting<br />Future Healthcare<br />Professionals.</>
           )}
         </h1>
 
-        <p className="text-slate-500 text-sm leading-relaxed mb-10 max-w-[260px]">
-          {t('home.hero_description')}
+        <p className="text-slate-500 text-sm leading-relaxed mb-10 max-w-[348px]">
+          {t('home.hero_description_1')}<br />
+          {t('home.hero_description_1b')}<br />
+          {t('home.hero_description_2')}<br />
+          {t('home.hero_description_2b')}
         </p>
 
-        <div className="flex flex-col gap-3 w-fit">
+        <div className="flex flex-col gap-3 w-full max-w-[220px]">
           <Link
             href="/contact"
-            className="inline-flex items-center gap-2 bg-slate-900 text-white text-[11px] tracking-widest uppercase font-bold px-6 py-3.5 hover:bg-slate-700 transition-colors"
+            className="inline-flex items-center justify-center gap-2 bg-slate-900 text-white text-[17px] tracking-widest uppercase font-bold px-6 py-3.5 hover:bg-slate-700 transition-colors"
           >
-            {t('home.cta_join')} →
+            {t('home.cta_join')}
           </Link>
           <Link
             href="/about"
-            className="inline-flex items-center gap-2 border border-slate-200 text-slate-500 text-[11px] tracking-widest uppercase font-bold px-6 py-3.5 hover:border-slate-900 hover:text-slate-900 transition-colors"
+            className="inline-flex items-center justify-center gap-2 border border-slate-200 text-slate-500 text-[17px] tracking-widest uppercase font-bold px-6 py-3.5 hover:border-slate-900 hover:text-slate-900 transition-colors"
           >
             {t('home.cta_learn')}
           </Link>
@@ -115,7 +126,7 @@ export default function HeroSlideshow() {
                 src={slide.imageSrc}
                 alt={lang === 'ja' ? slide.label_ja : slide.label_en}
                 fill
-                className="object-cover"
+                className="object-cover object-[center_30%]"
                 priority={i === 0}
               />
             ) : (

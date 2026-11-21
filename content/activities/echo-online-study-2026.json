@@ -1,0 +1,15 @@
+{
+  "id": "echo-online-study-2026",
+  "title_ja": "エコーオンライン勉強会",
+  "title_en": "Echo Online Study Session",
+  "date": "2026-10-14T18:00:00.000Z",
+  "type": ["seminar"],
+  "status": ["upcoming"],
+  "description_ja": "【エコーオンライン勉強会のお知らせ📢】\n\nPSMA／浜松医科大学HERUS／SMAQ 中部よりご案内です！\n\n10月14日(水)に全国の医療系学生向けのエコー勉強会を開催予定です！\nHERUS及びSMAQとのコラボは初の試みとなります！\n各大学・団体で主体的な勉強・交流会ができたらと思います。\nご興味のある方、ぜひご参加ください✨\n\n【お申し込み】\nQRコードまたは以下のURLからお願いします！\nhttps://forms.gle/rHKm3PuURrosXj2i9\n\n皆様の参加をお待ちしております🔥\n\nPSMA @psmajpocus\nHERUS @herus.jp\nSMAQ",
+  "description_en": "[Echo Online Study Session Announcement 📢]\n\nFrom PSMA / Hamamatsu University HERUS / SMAQ Chubu!\n\nWe are planning an online echo study session for medical students nationwide on Wednesday, October 14th!\nThis will be the first-ever collaboration with HERUS and SMAQ!\nWe hope each university and group can actively study and exchange ideas together.\nIf you are interested, please join us✨\n\n[How to Apply]\nPlease apply via QR code or the URL below!\nhttps://forms.gle/rHKm3PuURrosXj2i9\n\nWe look forward to seeing you there🔥\n\nPSMA @psmajpocus\nHERUS @herus.jp\nSMAQ",
+  "thumbnail": {
+    "url": "/images/articles/echo-online-study.jpg",
+    "width": 1080,
+    "height": 1527
+  }
+}

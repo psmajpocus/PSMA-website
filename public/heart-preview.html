@@ -1,0 +1,1310 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Heart Model Preview — BodyParts3D</title>
+<!-- earcut must load BEFORE importmap -->
+<script src="https://cdn.jsdelivr.net/npm/earcut@2.2.4/src/earcut.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0d1117;color:#e6edf3;font-family:system-ui,sans-serif;overflow:hidden;display:flex}
+
+/* ── 3D ビューポート ─────────────────────────────────────── */
+#viewport{position:relative;flex-shrink:0;transition:width .25s}
+#viewport canvas{display:block}
+
+/* ── エコーパネル ────────────────────────────────────────── */
+#echo-panel{
+  width:360px;flex-shrink:0;border-left:1px solid #30363d;
+  background:#0d1117;display:flex;flex-direction:column;overflow:hidden;
+}
+#echo-panel.hidden{display:none}
+#echo-header{
+  padding:10px 14px;border-bottom:1px solid #30363d;
+  display:flex;align-items:center;justify-content:space-between;
+}
+#echo-header h3{font-size:13px;font-weight:600;color:#e6edf3}
+.echo-close-btn{
+  background:none;border:none;color:#6e7681;cursor:pointer;font-size:16px;
+  line-height:1;padding:0 4px;
+}
+.echo-close-btn:hover{color:#e6edf3}
+#echo-view-label{
+  padding:6px 14px;font-size:11px;color:#58a6ff;
+  border-bottom:1px solid #21262d;background:#111820;min-height:28px;
+}
+#echo-canvas-wrap{flex:1;position:relative;background:#000;overflow:hidden}
+#echo-canvas{width:100%;height:100%;display:block}
+#echo-img{
+  position:absolute;inset:0;width:100%;height:100%;
+  object-fit:contain;display:none;
+}
+#echo-vid{
+  position:absolute;inset:0;width:100%;height:100%;
+  object-fit:contain;display:none;
+}
+#echo-tools{
+  padding:8px 14px;border-top:1px solid #30363d;
+  display:flex;gap:6px;flex-wrap:wrap;
+}
+.echo-tool-btn{
+  flex:1;padding:5px 8px;border-radius:5px;border:none;cursor:pointer;
+  font-size:11px;background:#21262d;color:#8b949e;transition:background .15s;min-width:80px;
+}
+.echo-tool-btn:hover{background:#2d333b;color:#e6edf3}
+#upload-input{display:none}
+
+/* ── 左パネル（表示切替）────────────────────────────────── */
+.panel{
+  position:absolute;z-index:10;
+  background:rgba(13,17,23,.88);border:1px solid #30363d;
+  border-radius:8px;padding:10px 12px;
+  backdrop-filter:blur(6px);
+  max-height:calc(100vh - 80px);overflow-y:auto;
+}
+.panel h2{font-size:10px;font-weight:600;text-transform:uppercase;
+          letter-spacing:.06em;color:#6e7681;margin-bottom:7px}
+#vis-panel{left:12px;top:12px;width:185px}
+.vis-group{margin-bottom:2px;font-size:10px;color:#6e7681;
+           margin-top:6px;padding-top:5px;border-top:1px solid #21262d;
+           text-transform:uppercase;letter-spacing:.05em}
+.vis-group:first-child{border-top:none;margin-top:0}
+.vis-row{display:flex;align-items:center;gap:6px;margin-bottom:4px;cursor:pointer}
+.vis-row input[type=checkbox]{accent-color:#58a6ff;cursor:pointer;width:12px;height:12px;flex-shrink:0}
+.swatch{width:9px;height:9px;border-radius:2px;flex-shrink:0}
+.vis-label{font-size:11px;line-height:1.3}
+
+/* ── 右パネル（切断コントロール）──────────────────────── */
+#clip-panel{right:12px;top:12px;width:215px}
+
+/* セクション区切り */
+.section-divider{
+  font-size:10px;font-weight:600;color:#6e7681;
+  text-transform:uppercase;letter-spacing:.06em;
+  border-top:1px solid #21262d;padding-top:8px;margin-top:8px;margin-bottom:6px;
+}
+.section-divider:first-child{border-top:none;padding-top:0;margin-top:0}
+
+/* プリセットクリップ */
+.clip-toggle{
+  width:100%;padding:5px 8px;border-radius:5px;border:none;cursor:pointer;
+  font-size:12px;font-weight:600;transition:background .15s;
+}
+.clip-toggle.off{background:#21262d;color:#8b949e}
+.clip-toggle.on {background:#1a3a5c;color:#58a6ff;outline:1px solid #1f6feb}
+#clip-sub{margin-top:9px}
+.clip-mode-row{display:flex;gap:4px;margin-bottom:8px;flex-wrap:wrap}
+.modeBtn{
+  flex:1;padding:4px 4px;border-radius:4px;border:none;cursor:pointer;
+  font-size:10px;background:#21262d;color:#8b949e;min-width:44px;
+  transition:background .15s;line-height:1.3;text-align:center;
+}
+.modeBtn.active{background:#1a3a5c;color:#58a6ff;outline:1px solid #1f6feb}
+.sub-label{font-size:10px;color:#6e7681;margin-bottom:4px}
+input[type=range]{width:100%;accent-color:#58a6ff;margin-bottom:6px}
+.preset-grid{display:grid;grid-template-columns:1fr 1fr;gap:3px;margin-bottom:6px}
+.pBtn{
+  padding:3px;border-radius:4px;border:none;cursor:pointer;
+  font-size:10px;background:#21262d;color:#8b949e;transition:background .15s;
+}
+.pBtn:hover{background:#2d333b;color:#e6edf3}
+
+/* 自由切断 */
+.free-section{margin-top:2px}
+.free-btn-primary{
+  width:100%;padding:6px 8px;border-radius:5px;border:none;cursor:pointer;
+  font-size:12px;font-weight:600;background:#1a4a1a;color:#4ade80;
+  outline:1px solid #2a6a2a;transition:background .15s;margin-top:4px;
+}
+.free-btn-primary:hover{background:#1f5a1f}
+.free-btn-secondary{
+  width:100%;padding:5px 8px;border-radius:5px;border:none;cursor:pointer;
+  font-size:11px;background:#21262d;color:#8b949e;transition:background .15s;margin-top:4px;
+}
+.free-btn-secondary:hover{background:#2d333b;color:#e6edf3}
+.free-btn-danger{
+  width:100%;padding:5px 8px;border-radius:5px;border:none;cursor:pointer;
+  font-size:11px;background:#3a1a1a;color:#f85149;outline:1px solid #5a2a2a;
+  transition:background .15s;margin-top:4px;
+}
+.free-btn-danger:hover{background:#4a1f1f}
+.transform-row{display:flex;gap:4px;margin-top:4px;margin-bottom:4px}
+.xBtn{
+  flex:1;padding:4px;border-radius:4px;border:none;cursor:pointer;
+  font-size:11px;background:#21262d;color:#8b949e;transition:background .15s;
+}
+.xBtn.active{background:#1a3a5c;color:#58a6ff}
+.xBtn:hover{background:#2d333b}
+.axis-grid{display:grid;grid-template-columns:1fr 1fr;gap:3px;margin-bottom:4px}
+.axBtn{
+  padding:3px;border-radius:4px;border:none;cursor:pointer;
+  font-size:10px;background:#21262d;color:#8b949e;transition:background .15s;
+}
+.axBtn:hover{background:#2d333b;color:#e6edf3}
+
+/* disabled 状態 */
+.section-disabled{opacity:0.38;pointer-events:none}
+
+/* ── トップバー ──────────────────────────────────────────── */
+#topbar{
+  position:absolute;top:12px;left:50%;transform:translateX(-50%);z-index:10;
+  display:flex;gap:6px;
+}
+.top-btn{
+  padding:5px 11px;border-radius:5px;border:none;cursor:pointer;
+  font-size:12px;background:rgba(13,17,23,.88);color:#8b949e;
+  border:1px solid #30363d;transition:background .15s;
+  backdrop-filter:blur(4px);
+}
+.top-btn:hover{background:#21262d;color:#e6edf3}
+.top-btn.on{background:#1a3a5c;color:#58a6ff;border-color:#1f6feb}
+
+/* ── ボトムバー ──────────────────────────────────────────── */
+#bottom{
+  position:absolute;bottom:10px;left:50%;transform:translateX(-50%);z-index:10;
+  background:rgba(13,17,23,.7);border:1px solid #30363d;border-radius:5px;
+  padding:4px 12px;font-size:10px;color:#6e7681;white-space:nowrap;
+}
+kbd{background:#21262d;border:1px solid #30363d;border-radius:2px;padding:0 4px;font-size:9px}
+#attrib{position:absolute;bottom:10px;right:10px;z-index:10;font-size:9px;color:#484f58}
+#attrib a{color:inherit}
+
+/* ── Loading / Error ─────────────────────────────────────── */
+#loading,#error{
+  position:fixed;inset:0;display:flex;align-items:center;justify-content:center;
+  background:#0d1117;z-index:99;flex-direction:column;gap:10px
+}
+#error{display:none}
+#error h2{color:#f85149}
+#loading p,#error p{font-size:12px;color:#8b949e;text-align:center;max-width:400px;line-height:1.6}
+#error code{background:#161b22;padding:1px 5px;border-radius:3px;font-size:11px}
+.spinner{width:32px;height:32px;border:3px solid #30363d;border-top-color:#58a6ff;
+         border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+
+<div id="viewport">
+  <div id="loading"><div class="spinner"></div><p>heart_master.glb を読み込み中…</p></div>
+  <div id="error">
+    <h2>読み込みエラー</h2>
+    <p><code>npm run dev</code> を実行後<br>
+    <a href="http://localhost:3000/heart-preview.html" style="color:#58a6ff">localhost:3000/heart-preview.html</a> を開いてください</p>
+  </div>
+
+  <!-- 左パネル：表示/非表示 -->
+  <div class="panel" id="vis-panel"><h2>構造の表示/非表示</h2></div>
+
+  <!-- 右パネル：切断コントロール -->
+  <div class="panel" id="clip-panel">
+    <h2>断面切断パネル</h2>
+
+    <!-- ── 標準断面プリセット ── -->
+    <div class="section-divider">標準断面プリセット</div>
+    <div id="preset-section">
+      <button id="clipToggle" class="clip-toggle off">断面切断: OFF</button>
+      <div id="clip-sub" style="display:none">
+        <div class="clip-mode-row" style="margin-top:8px">
+          <button class="modeBtn active" data-m="short_axis">短軸<br><span style="font-size:9px">PSAX</span></button>
+          <button class="modeBtn" data-m="long_axis">前後断<br><span style="font-size:9px">PLAX</span></button>
+          <button class="modeBtn" data-m="lateral">左右断<br><span style="font-size:9px">矢状</span></button>
+        </div>
+        <div class="sub-label" id="slider-lbl">切断位置: 0%（なし）</div>
+        <input type="range" id="clipSlider" min="0" max="100" value="0"/>
+        <div class="sub-label" id="preset-lbl">PSAX レベル</div>
+        <div class="preset-grid" id="presetGrid"></div>
+        <div id="clipHint" style="font-size:10px;color:#6e7681;line-height:1.5"></div>
+      </div>
+    </div>
+
+    <!-- ── 自由切断 ── -->
+    <div class="section-divider">自由切断</div>
+    <div class="free-section" id="free-section">
+
+      <!-- idle state -->
+      <div id="free-idle">
+        <button class="free-btn-secondary" id="enterFreeCutBtn">自由切断モードへ</button>
+      </div>
+
+      <!-- positioning state -->
+      <div id="free-positioning" style="display:none">
+        <div class="sub-label">変形モード</div>
+        <div class="transform-row">
+          <button class="xBtn active" id="xTransBtn">移動</button>
+          <button class="xBtn" id="xRotBtn">回転</button>
+        </div>
+        <div class="sub-label">軸リセット</div>
+        <div class="axis-grid">
+          <button class="axBtn" id="freeReset-Z">短軸 Z</button>
+          <button class="axBtn" id="freeReset-Y">前後 Y</button>
+          <button class="axBtn" id="freeReset-X">左右 X</button>
+          <button class="axBtn" id="freeReset-C">中心へ</button>
+        </div>
+        <button class="free-btn-primary" id="executeCutBtn">切断を実行</button>
+        <button class="free-btn-secondary" id="cancelFreeCutBtn">キャンセル</button>
+      </div>
+
+      <!-- cut state -->
+      <div id="free-cut" style="display:none">
+        <div style="font-size:10px;color:#4ade80;margin-bottom:6px">切断完了</div>
+        <button class="free-btn-secondary" id="resetPositioningBtn">切断面を再設定</button>
+        <button class="free-btn-danger" id="fullResetBtn">初期状態に戻す</button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- トップバー：エコーパネルトグル -->
+  <div id="topbar">
+    <button class="top-btn" id="echoToggle">エコー参照パネル</button>
+  </div>
+
+  <div id="bottom">
+    ドラッグ: 回転 &nbsp;|&nbsp; 右ドラッグ/2本指: 移動 &nbsp;|&nbsp; スクロール: ズーム
+    &nbsp;|&nbsp; <kbd>R</kbd> 視点 &nbsp;|&nbsp; <kbd>C</kbd> 切断 &nbsp;|&nbsp; <kbd>E</kbd> エコー
+  </div>
+  <div id="attrib">
+    <a href="https://dbarchive.biosciencedbc.jp/en/bodyparts3d/desc.html" target="_blank">BodyParts3D</a>
+    &copy; DBCLS &middot; CC BY-SA 2.1 JP
+  </div>
+</div>
+
+<!-- ── エコーパネル ────────────────────────────────────────── -->
+<div id="echo-panel" class="hidden">
+  <div id="echo-header">
+    <h3>エコー参照画像</h3>
+    <button class="echo-close-btn" id="echoClose">&#x2715;</button>
+  </div>
+  <div id="echo-view-label">— 切断面なし —</div>
+  <div id="echo-canvas-wrap">
+    <canvas id="echo-canvas"></canvas>
+    <img id="echo-img" alt="echo"/>
+    <video id="echo-vid" controls loop muted playsinline></video>
+  </div>
+  <div id="echo-tools">
+    <button class="echo-tool-btn" id="uploadBtn">画像・動画を読み込む</button>
+    <input type="file" id="uploadInput" accept="image/*,video/*"/>
+    <button class="echo-tool-btn" id="schematicBtn">模式図に切替</button>
+    <button class="echo-tool-btn" id="clearBtn">クリア</button>
+  </div>
+</div>
+
+<!-- ── Three.js ────────────────────────────────────────────── -->
+<script type="importmap">
+{
+  "imports": {
+    "three":         "https://cdn.jsdelivr.net/npm/three@0.162.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.162.0/examples/jsm/"
+  }
+}
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { GLTFLoader }        from 'three/addons/loaders/GLTFLoader.js';
+import { OrbitControls }     from 'three/addons/controls/OrbitControls.js';
+import { TransformControls } from 'three/addons/controls/TransformControls.js';
+
+// earcut from global (loaded via script tag before importmap)
+const earcut = window.earcut;
+
+// ── Renderer ─────────────────────────────────────────────────
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.localClippingEnabled = true;
+document.getElementById('viewport').appendChild(renderer.domElement);
+
+// ── Scene ────────────────────────────────────────────────────
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x0d1117);
+
+// ── Camera (Z up = 頭側) ─────────────────────────────────────
+const camera = new THREE.PerspectiveCamera(40, 1, 0.001, 100);
+camera.up.set(0, 0, 1);
+camera.position.set(0, -0.38, 0);
+
+// ── Lights ───────────────────────────────────────────────────
+scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+const kL = new THREE.DirectionalLight(0xffffff, 1.1); kL.position.set(1,-2,2);  scene.add(kL);
+const fL = new THREE.DirectionalLight(0xffffff, 0.4); fL.position.set(-2,1,-1); scene.add(fL);
+const rL = new THREE.DirectionalLight(0xffffff, 0.3); rL.position.set(0,2,-2);  scene.add(rL);
+
+// ── OrbitControls ─────────────────────────────────────────────
+const orbit = new OrbitControls(camera, renderer.domElement);
+orbit.enableDamping = true; orbit.dampingFactor = 0.06;
+orbit.minDistance = 0.04;  orbit.maxDistance = 3;
+orbit.target.set(0,0,0);  orbit.update();
+const initPos = camera.position.clone();
+const initTgt = orbit.target.clone();
+
+// ── Clip plane (for preset shader clips) ─────────────────────
+const clipPlane = new THREE.Plane(new THREE.Vector3(0,0,-1), 1e5);
+
+// 切断面インジケーター（ディスク）
+const discG     = new THREE.CircleGeometry(1, 64);
+const discM     = new THREE.MeshBasicMaterial({ color:0xffd700, transparent:true, opacity:0.18, side:THREE.DoubleSide, depthWrite:false });
+const discMesh  = new THREE.Mesh(discG, discM);
+const bG        = new THREE.EdgesGeometry(new THREE.CircleGeometry(1, 64));
+const bM        = new THREE.LineBasicMaterial({ color:0xffd700, transparent:true, opacity:0.65 });
+const borderMesh = new THREE.LineSegments(bG, bM);
+discMesh.visible = borderMesh.visible = false;
+scene.add(discMesh, borderMesh);
+
+// ── TransformControls（自由切断ポジショニング用）──────────────
+const pivot = new THREE.Object3D();
+scene.add(pivot);
+const xCtrl = new TransformControls(camera, renderer.domElement);
+xCtrl.attach(pivot);
+xCtrl.visible = xCtrl.enabled = false;
+xCtrl.setMode('translate');
+scene.add(xCtrl);
+xCtrl.addEventListener('dragging-changed', e => { orbit.enabled = !e.value; });
+xCtrl.addEventListener('change', updateFreeDisc);
+
+// ── 構造定義 ──────────────────────────────────────────────────
+const STRUCTURES = [
+  { name:'Right_Atrium',          ja:'右心房壁',     color:'#dc5050', group:'心房' },
+  { name:'Left_Atrium',           ja:'左心房壁',     color:'#aa2323', group:'心房' },
+  { name:'Right_Ventricle',       ja:'右心室壁',     color:'#ff8c8c', group:'心室' },
+  { name:'Left_Ventricle',        ja:'左心室壁',     color:'#ff6464', group:'心室' },
+  { name:'Ascending_Aorta',       ja:'上行大動脈',   color:'#c80f0f', group:'大血管' },
+  { name:'Pulmonary_Trunk',       ja:'肺動脈幹',     color:'#3c64e6', group:'大血管' },
+  { name:'Superior_Vena_Cava',    ja:'上大静脈',     color:'#1e3cb4', group:'大血管' },
+  { name:'Inferior_Vena_Cava',    ja:'下大静脈',     color:'#2d55cd', group:'大血管' },
+  { name:'Mitral_Valve',          ja:'僧帽弁',       color:'#ffd700', group:'弁' },
+  { name:'Tricuspid_Valve',       ja:'三尖弁',       color:'#ffeb50', group:'弁' },
+  { name:'Aortic_Valve',          ja:'大動脈弁',     color:'#ff8c00', group:'弁' },
+  { name:'Pulmonary_Valve',       ja:'肺動脈弁',     color:'#ffaa32', group:'弁' },
+  { name:'Right_Pulmonary_Veins', ja:'右肺静脈',     color:'#8c8cff', group:'肺静脈' },
+  { name:'Left_Pulmonary_Veins',  ja:'左肺静脈',     color:'#aa64ff', group:'肺静脈' },
+  { name:'RV_Papillary_Muscles',  ja:'右室乳頭筋',   color:'#b4693c', group:'乳頭筋' },
+  { name:'LV_Papillary_Muscles',  ja:'左室乳頭筋',   color:'#8c411e', group:'乳頭筋' },
+  { name:'Right_Coronary_Artery', ja:'右冠動脈',     color:'#ff3232', group:'冠動脈' },
+  { name:'Left_Coronary_System',  ja:'左冠動脈系',   color:'#ff691e', group:'冠動脈' },
+];
+
+// ── 可視性パネル ──────────────────────────────────────────────
+const visPanel = document.getElementById('vis-panel');
+let lastGroup = '';
+STRUCTURES.forEach(s => {
+  if (s.group !== lastGroup) {
+    const g = document.createElement('div');
+    g.className = 'vis-group'; g.textContent = s.group;
+    visPanel.appendChild(g); lastGroup = s.group;
+  }
+  const row = document.createElement('label'); row.className = 'vis-row';
+  const chk = document.createElement('input');
+  chk.type = 'checkbox'; chk.checked = true; chk.dataset.name = s.name;
+  const sw  = document.createElement('div');
+  sw.className = 'swatch'; sw.style.background = s.color;
+  const lbl = document.createElement('span');
+  lbl.className = 'vis-label'; lbl.textContent = s.ja;
+  row.append(chk, sw, lbl); visPanel.appendChild(row);
+});
+
+// ── ジオメトリスライス関数群 ──────────────────────────────────
+
+/**
+ * sliceGeometry: BufferGeometry を平面で切断する。
+ * 前面側ジオメトリ + キャップエッジ（[Vector3,Vector3][] pairs）を返す。
+ */
+function sliceGeometry(geo, plane) {
+  // 非インデックス化
+  const nonIndexed = geo.index ? geo.toNonIndexed() : geo.clone();
+  const posAttr = nonIndexed.getAttribute('position');
+  const nrmAttr = nonIndexed.getAttribute('normal');
+
+  const frontPos = [];
+  const frontNrm = [];
+  const capEdges  = [];
+
+  const EPS = 0;
+
+  function getVec(attr, i) {
+    return new THREE.Vector3(attr.getX(i), attr.getY(i), attr.getZ(i));
+  }
+  function lerpV(a, b, t) {
+    return new THREE.Vector3().lerpVectors(a, b, t);
+  }
+  function pushTri(p0, p1, p2, n0, n1, n2) {
+    frontPos.push(p0.x, p0.y, p0.z, p1.x, p1.y, p1.z, p2.x, p2.y, p2.z);
+    frontNrm.push(n0.x, n0.y, n0.z, n1.x, n1.y, n1.z, n2.x, n2.y, n2.z);
+  }
+
+  const triCount = posAttr.count / 3;
+  for (let ti = 0; ti < triCount; ti++) {
+    const i0 = ti * 3, i1 = i0 + 1, i2 = i0 + 2;
+    const v = [getVec(posAttr, i0), getVec(posAttr, i1), getVec(posAttr, i2)];
+    const n = nrmAttr
+      ? [getVec(nrmAttr, i0), getVec(nrmAttr, i1), getVec(nrmAttr, i2)]
+      : [new THREE.Vector3(0,1,0), new THREE.Vector3(0,1,0), new THREE.Vector3(0,1,0)];
+
+    // Signed distances to plane for each vertex
+    const d = [
+      plane.distanceToPoint(v[0]),
+      plane.distanceToPoint(v[1]),
+      plane.distanceToPoint(v[2]),
+    ];
+
+    // Front-count
+    let fc = 0;
+    if (d[0] >= EPS) fc++;
+    if (d[1] >= EPS) fc++;
+    if (d[2] >= EPS) fc++;
+
+    if (fc === 3) {
+      // All in front: keep as-is
+      pushTri(v[0], v[1], v[2], n[0], n[1], n[2]);
+    } else if (fc === 0) {
+      // All behind: discard
+    } else if (fc === 1) {
+      // One front vertex
+      let fi = -1;
+      for (let k = 0; k < 3; k++) { if (d[k] >= EPS) { fi = k; break; } }
+      const b1 = (fi + 1) % 3;
+      const b2 = (fi + 2) % 3;
+      const t1 = d[fi] / (d[fi] - d[b1]);
+      const t2 = d[fi] / (d[fi] - d[b2]);
+      const p1 = lerpV(v[fi], v[b1], t1);
+      const p2 = lerpV(v[fi], v[b2], t2);
+      const pn1 = lerpV(n[fi], n[b1], t1).normalize();
+      const pn2 = lerpV(n[fi], n[b2], t2).normalize();
+      pushTri(v[fi], p1, p2, n[fi], pn1, pn2);
+      capEdges.push([p1.clone(), p2.clone()]);
+    } else if (fc === 2) {
+      // One back vertex
+      let bi = -1;
+      for (let k = 0; k < 3; k++) { if (d[k] < EPS) { bi = k; break; } }
+      const f1 = (bi + 1) % 3;
+      const f2 = (bi + 2) % 3;
+      const t1 = d[f1] / (d[f1] - d[bi]);
+      const t2 = d[f2] / (d[f2] - d[bi]);
+      const p1 = lerpV(v[f1], v[bi], t1);
+      const p2 = lerpV(v[f2], v[bi], t2);
+      const pn1 = lerpV(n[f1], n[bi], t1).normalize();
+      const pn2 = lerpV(n[f2], n[bi], t2).normalize();
+      // Quad: two triangles
+      pushTri(v[f1], v[f2], p1, n[f1], n[f2], pn1);
+      pushTri(v[f2], p2, p1, n[f2], pn2, pn1);
+      // capEdge reversed for consistent winding
+      capEdges.push([p2.clone(), p1.clone()]);
+    }
+  }
+
+  const frontGeo = new THREE.BufferGeometry();
+  if (frontPos.length > 0) {
+    frontGeo.setAttribute('position', new THREE.Float32BufferAttribute(frontPos, 3));
+    frontGeo.setAttribute('normal',   new THREE.Float32BufferAttribute(frontNrm, 3));
+  }
+
+  return { frontGeo, capEdges };
+}
+
+/**
+ * chainEdges: キャップエッジリストをループに連結する。
+ */
+function chainEdges(edges) {
+  if (edges.length === 0) return [];
+  const used = new Array(edges.length).fill(false);
+  const loops = [];
+  const TOL2  = 1e-10;
+
+  for (let start = 0; start < edges.length; start++) {
+    if (used[start]) continue;
+    used[start] = true;
+    const loop = [edges[start][0].clone(), edges[start][1].clone()];
+
+    let extended = true;
+    while (extended) {
+      extended = false;
+      const tail = loop[loop.length - 1];
+      for (let i = 0; i < edges.length; i++) {
+        if (used[i]) continue;
+        if (tail.distanceToSquared(edges[i][0]) < TOL2) {
+          used[i] = true;
+          loop.push(edges[i][1].clone());
+          extended = true;
+          break;
+        }
+      }
+    }
+
+    // Close check: if first ≈ last, pop duplicate
+    if (loop.length > 2 && loop[0].distanceToSquared(loop[loop.length - 1]) < TOL2) {
+      loop.pop();
+    }
+    if (loop.length >= 3) loops.push(loop);
+  }
+  return loops;
+}
+
+/**
+ * buildCapGeo: ループからearcutを使ってキャップジオメトリを作る。
+ */
+function buildCapGeo(loops, plane) {
+  if (!earcut || loops.length === 0) return null;
+
+  // Build local (U, V, N) coordinate frame from plane.normal
+  const N = plane.normal.clone().normalize();
+  let U = new THREE.Vector3(1, 0, 0);
+  if (Math.abs(N.dot(U)) > 0.9) U = new THREE.Vector3(0, 1, 0);
+  const V = new THREE.Vector3().crossVectors(N, U).normalize();
+  U.crossVectors(V, N).normalize();
+
+  function project2D(pt) {
+    return [pt.dot(U), pt.dot(V)];
+  }
+
+  // Process each loop: project to 2D, check winding, earcut
+  const allPositions = [];
+  const allNormals   = [];
+
+  for (const loop of loops) {
+    const coords2D = [];
+    for (const pt of loop) {
+      const [u, v] = project2D(pt);
+      coords2D.push(u, v);
+    }
+
+    // Signed area to determine winding
+    let area = 0;
+    const n = loop.length;
+    for (let i = 0; i < n; i++) {
+      const j = (i + 1) % n;
+      area += coords2D[i*2] * coords2D[j*2+1];
+      area -= coords2D[j*2] * coords2D[i*2+1];
+    }
+    area /= 2;
+
+    // Ensure CCW (positive area in UV space)
+    if (area < 0) {
+      loop.reverse();
+      coords2D.reverse();
+      // Re-project after reverse
+      const rp = [];
+      for (const pt of loop) {
+        const [u, v] = project2D(pt);
+        rp.push(u, v);
+      }
+      coords2D.length = 0;
+      for (const val of rp) coords2D.push(val);
+    }
+
+    let indices;
+    try {
+      indices = earcut(coords2D, null, 2);
+    } catch(e) {
+      continue;
+    }
+    if (!indices || indices.length === 0) continue;
+
+    for (let k = 0; k < indices.length; k++) {
+      const idx = indices[k];
+      const pt  = loop[idx];
+      allPositions.push(pt.x, pt.y, pt.z);
+      allNormals.push(N.x, N.y, N.z);
+    }
+  }
+
+  if (allPositions.length === 0) return null;
+
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.Float32BufferAttribute(allPositions, 3));
+  geo.setAttribute('normal',   new THREE.Float32BufferAttribute(allNormals, 3));
+  return geo;
+}
+
+/**
+ * getLocalPlane: ワールド平面をメッシュのローカル空間に変換する。
+ */
+function getLocalPlane(worldPlane, mesh) {
+  mesh.updateMatrixWorld();
+  const worldPt  = worldPlane.normal.clone().multiplyScalar(-worldPlane.constant);
+  const invM     = mesh.matrixWorld.clone().invert();
+  const localPt  = worldPt.clone().applyMatrix4(invM);
+  const m3       = new THREE.Matrix3().setFromMatrix4(mesh.matrixWorld).transpose();
+  const localNormal = worldPlane.normal.clone().applyMatrix3(m3).normalize();
+  return new THREE.Plane().setFromNormalAndCoplanarPoint(localNormal, localPt);
+}
+
+// ── データストレージ ──────────────────────────────────────────
+const meshMap        = new Map();    // name -> Mesh
+const originalGeos   = new Map();    // name -> BufferGeometry
+const capMeshObjects = [];           // cap meshes added during cut
+let   modelBox       = null;
+let   discSize       = 0.15;
+
+// ── Free-cut state machine ────────────────────────────────────
+// 'idle' | 'positioning' | 'cut'
+let freeCutState = 'idle';
+// Plane used for positioning / cutting
+const freePlane  = new THREE.Plane(new THREE.Vector3(0,0,1), 0);
+
+// ── GLB ロード ────────────────────────────────────────────────
+new GLTFLoader().load(
+  'models/heart_master.glb',
+  (gltf) => {
+    const model = gltf.scene;
+    const box   = new THREE.Box3().setFromObject(model);
+    const ctr   = box.getCenter(new THREE.Vector3());
+    const sz    = box.getSize(new THREE.Vector3());
+    const scale = 0.25 / Math.max(sz.x, sz.y, sz.z);
+    model.position.sub(ctr.clone().multiplyScalar(scale));
+    model.scale.setScalar(scale);
+    scene.add(model);
+
+    modelBox = new THREE.Box3().setFromObject(model);
+    discSize = Math.max(sz.x, sz.y) * scale * 0.7;
+    discMesh.scale.setScalar(discSize);
+    borderMesh.scale.setScalar(discSize);
+
+    model.traverse(node => {
+      if (!node.isMesh) return;
+      // Clone material, keep side as loaded (GLB sets doubleSided=false for wall structs)
+      node.material = node.material.clone();
+      node.material.clippingPlanes = [clipPlane];
+      node.material.needsUpdate    = true;
+      if (node.name) {
+        meshMap.set(node.name, node);
+        // Store original geometry for reset
+        originalGeos.set(node.name, node.geometry.clone());
+      }
+    });
+
+    // ピボットをモデル中心に
+    const mc = new THREE.Vector3();
+    modelBox.getCenter(mc);
+    pivot.position.copy(mc);
+
+    // 可視性チェックボックスのイベント（_Inner ペアも連動）
+    document.querySelectorAll('#vis-panel input[type=checkbox]').forEach(cb => {
+      cb.addEventListener('change', () => {
+        const m = meshMap.get(cb.dataset.name);
+        if (m) m.visible = cb.checked;
+        const inner = meshMap.get(cb.dataset.name + '_Inner');
+        if (inner) inner.visible = cb.checked;
+      });
+    });
+
+    document.getElementById('loading').style.display = 'none';
+  },
+  null,
+  (err) => {
+    console.error(err);
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('error').style.display   = 'flex';
+  }
+);
+
+// ── ビューポートサイズ管理 ────────────────────────────────────
+const ECHO_W = 360;
+let showingSchematic    = true;
+let currentSchematicKey = 'none';
+const echoCvs = document.getElementById('echo-canvas');
+
+function resizeViewport() {
+  const ep    = document.getElementById('echo-panel');
+  const echoOn = !ep.classList.contains('hidden');
+  const vw    = echoOn ? innerWidth - ECHO_W : innerWidth;
+  const vh    = innerHeight;
+  renderer.setSize(vw, vh);
+  camera.aspect = vw / vh;
+  camera.updateProjectionMatrix();
+  document.getElementById('viewport').style.width = vw + 'px';
+  const ec = document.getElementById('echo-canvas');
+  ec.width  = ec.offsetWidth;
+  ec.height = ec.offsetHeight;
+  if (showingSchematic) drawSchematic(currentSchematicKey);
+}
+resizeViewport();
+window.addEventListener('resize', resizeViewport);
+
+// ── プリセット切断 ────────────────────────────────────────────
+let clipEnabled = false;
+let clipMode    = 'short_axis';
+let sliderPct   = 0;
+
+const CLIP_HINTS = {
+  short_axis:'短軸: 上部（頭側）から切断\nスライダー大→心尖部レベル',
+  long_axis: '前後断: 前壁側から切断\nスライダー大→後壁を露出',
+  lateral:   '左右断: 患者右側から切断\nスライダー大→左心を露出',
+};
+const PRESETS = {
+  short_axis:[ {l:'大動脈弁',v:20},{l:'僧帽弁',v:38},{l:'乳頭筋',v:60},{l:'心尖部',v:80} ],
+  long_axis: [ {l:'25%',v:25},{l:'50%',v:50},{l:'75%',v:75},{l:'90%',v:90} ],
+  lateral:   [ {l:'A4C 相当',v:55},{l:'左寄り',v:30},{l:'中央',v:50},{l:'右寄り',v:70} ],
+};
+const ECHO_LABELS = {
+  short_axis_20:'PSAX — 大動脈弁レベル',
+  short_axis_38:'PSAX — 僧帽弁レベル',
+  short_axis_60:'PSAX — 乳頭筋レベル',
+  short_axis_80:'PSAX — 心尖部レベル',
+  long_axis_50: 'PLAX 系 — 前後断',
+  lateral_55:   'A4C 相当 — 心室中隔レベル',
+  free:         '自由切断',
+};
+
+function buildPresetGrid() {
+  const grid = document.getElementById('presetGrid');
+  grid.innerHTML = '';
+  (PRESETS[clipMode] || []).forEach(p => {
+    const b = document.createElement('button');
+    b.className = 'pBtn'; b.textContent = p.l;
+    b.addEventListener('click', () => {
+      document.getElementById('clipSlider').value = p.v;
+      sliderPct = p.v;
+      updateSliderLbl();
+      updatePresetClip();
+      updateEchoLabel();
+    });
+    grid.appendChild(b);
+  });
+  document.getElementById('clipHint').textContent = (CLIP_HINTS[clipMode] || '').replace('\\n','\n');
+  document.getElementById('preset-lbl').textContent =
+    clipMode === 'short_axis' ? 'PSAX レベル' : 'クイックアクセス';
+}
+buildPresetGrid();
+
+function updateSliderLbl() {
+  const s = sliderPct;
+  document.getElementById('slider-lbl').textContent =
+    s === 0 ? '切断位置: 0%（なし）' : `切断位置: ${s}%`;
+}
+
+function orientObj(obj, normal) {
+  const f = new THREE.Vector3(0, 0, 1);
+  const t = normal.clone().normalize();
+  if (f.dot(t) < -0.9999) obj.quaternion.setFromAxisAngle(new THREE.Vector3(1,0,0), Math.PI);
+  else obj.quaternion.setFromUnitVectors(f, t);
+}
+
+function updatePresetClip() {
+  if (!clipEnabled || !modelBox) {
+    clipPlane.set(new THREE.Vector3(0,0,-1), 1e5);
+    discMesh.visible = borderMesh.visible = false;
+    return;
+  }
+  const { min, max } = modelBox;
+  const t = sliderPct / 100;
+  let normal, constant, pos, dNormal;
+
+  if (clipMode === 'short_axis') {
+    const cz = max.z - t * (max.z - min.z);
+    normal  = new THREE.Vector3(0,0,-1); constant = cz;
+    pos     = new THREE.Vector3((min.x+max.x)/2, (min.y+max.y)/2, cz);
+    dNormal = new THREE.Vector3(0,0,1);
+  } else if (clipMode === 'long_axis') {
+    const cy = min.y + t * (max.y - min.y);
+    normal  = new THREE.Vector3(0,1,0); constant = -cy;
+    pos     = new THREE.Vector3((min.x+max.x)/2, cy, (min.z+max.z)/2);
+    dNormal = new THREE.Vector3(0,1,0);
+  } else {
+    const cx = min.x + t * (max.x - min.x);
+    normal  = new THREE.Vector3(1,0,0); constant = -cx;
+    pos     = new THREE.Vector3(cx, (min.y+max.y)/2, (min.z+max.z)/2);
+    dNormal = new THREE.Vector3(1,0,0);
+  }
+
+  clipPlane.set(normal, constant);
+  discMesh.position.copy(pos);  borderMesh.position.copy(pos);
+  orientObj(discMesh, dNormal); borderMesh.quaternion.copy(discMesh.quaternion);
+  discMesh.visible = borderMesh.visible = true;
+}
+
+// ── 自由切断ディスク更新（ポジショニング中）─────────────────
+function updateFreeDisc() {
+  if (freeCutState !== 'positioning') return;
+  const n = new THREE.Vector3(0,0,1).applyQuaternion(pivot.quaternion).normalize();
+  freePlane.setFromNormalAndCoplanarPoint(n, pivot.position);
+  discMesh.position.copy(pivot.position);
+  discMesh.quaternion.copy(pivot.quaternion);
+  borderMesh.position.copy(pivot.position);
+  borderMesh.quaternion.copy(pivot.quaternion);
+  discMesh.visible = borderMesh.visible = true;
+}
+
+// ── 自由切断: ステート遷移 ────────────────────────────────────
+
+function setFreeCutState(state) {
+  freeCutState = state;
+  document.getElementById('free-idle').style.display        = state === 'idle'        ? 'block' : 'none';
+  document.getElementById('free-positioning').style.display = state === 'positioning' ? 'block' : 'none';
+  document.getElementById('free-cut').style.display         = state === 'cut'         ? 'block' : 'none';
+
+  // Preset section: disable when cut is active
+  const presetSection = document.getElementById('preset-section');
+  presetSection.classList.toggle('section-disabled', state === 'cut');
+}
+
+function enterPositioning() {
+  // If coming from cut state, restore geometries first (keep cut state clean)
+  if (freeCutState === 'cut') {
+    restoreOriginalGeos();
+  }
+  setFreeCutState('positioning');
+
+  // Show TransformControls and disc
+  xCtrl.visible = xCtrl.enabled = true;
+  if (modelBox) {
+    const mc = new THREE.Vector3(); modelBox.getCenter(mc);
+    pivot.position.copy(mc);
+  }
+  pivot.quaternion.identity();
+  updateFreeDisc();
+}
+
+function cancelPositioning() {
+  xCtrl.visible = xCtrl.enabled = false;
+  discMesh.visible = borderMesh.visible = false;
+  setFreeCutState('idle');
+}
+
+function executeCut() {
+  if (!modelBox) return;
+
+  // Ensure camera is on positive side of plane
+  const camDist = freePlane.distanceToPoint(camera.position);
+  const cutPlane = freePlane.clone();
+  if (camDist < 0) {
+    cutPlane.negate();
+  }
+
+  // Hide gizmo and disc
+  xCtrl.visible = xCtrl.enabled = false;
+  discMesh.visible = borderMesh.visible = false;
+
+  // Disable shader clipping on all meshes (geometry is physically cut)
+  meshMap.forEach(mesh => {
+    mesh.material.clippingPlanes = [];
+  });
+
+  // Slice each visible mesh
+  meshMap.forEach((mesh, name) => {
+    if (!mesh.visible) return;
+    const localPlane = getLocalPlane(cutPlane, mesh);
+    const { frontGeo, capEdges } = sliceGeometry(mesh.geometry, localPlane);
+
+    if (frontGeo.getAttribute('position') && frontGeo.getAttribute('position').count > 0) {
+      mesh.geometry = frontGeo;
+    }
+
+    // Build cap
+    if (capEdges.length > 0) {
+      const loops  = chainEdges(capEdges);
+      const capGeo = buildCapGeo(loops, localPlane);
+      if (capGeo && capGeo.getAttribute('position') && capGeo.getAttribute('position').count > 0) {
+        const meshColor = mesh.material.color ? mesh.material.color.clone() : new THREE.Color(1,1,1);
+        const capMat = new THREE.MeshStandardMaterial({
+          color:     meshColor.clone().lerp(new THREE.Color(1,1,1), 0.4),
+          side:      THREE.DoubleSide,
+          roughness: 0.7,
+          metalness: 0.0,
+        });
+        const capMeshObj = new THREE.Mesh(capGeo, capMat);
+        // Cap is in mesh local space — add as child
+        mesh.add(capMeshObj);
+        capMeshObjects.push(capMeshObj);
+      }
+    }
+  });
+
+  setFreeCutState('cut');
+  updateEchoLabel();
+}
+
+function restoreOriginalGeos() {
+  // Remove cap meshes
+  while (capMeshObjects.length > 0) {
+    const c = capMeshObjects.pop();
+    if (c.parent) c.parent.remove(c);
+    c.geometry.dispose();
+    c.material.dispose();
+  }
+  // Restore geometries and clipping planes
+  meshMap.forEach((mesh, name) => {
+    if (originalGeos.has(name)) {
+      mesh.geometry = originalGeos.get(name).clone();
+    }
+    mesh.material.clippingPlanes = [clipPlane];
+  });
+}
+
+function fullReset() {
+  restoreOriginalGeos();
+  xCtrl.visible = xCtrl.enabled = false;
+  discMesh.visible = borderMesh.visible = false;
+  setFreeCutState('idle');
+  updateEchoLabel();
+}
+
+function resetToPositioning() {
+  // Go back to positioning, restoring original geos first
+  enterPositioning();
+}
+
+// ── エコーパネル ──────────────────────────────────────────────
+const echoImg = document.getElementById('echo-img');
+const echoVid = document.getElementById('echo-vid');
+
+function updateEchoLabel() {
+  const key = clipEnabled
+    ? `${clipMode}_${sliderPct}`
+    : (freeCutState !== 'idle' ? 'free' : 'none');
+  const label = ECHO_LABELS[key] || (clipEnabled ? `切断 ${sliderPct}%` : (freeCutState !== 'idle' ? '自由切断' : '— 切断面なし —'));
+  document.getElementById('echo-view-label').textContent = label;
+  if (showingSchematic) {
+    currentSchematicKey = key;
+    drawSchematic(key);
+  }
+}
+
+// エコー模式図
+function drawSchematic(key) {
+  const cvs = echoCvs;
+  const w   = cvs.offsetWidth; const h = cvs.offsetHeight;
+  if (w === 0 || h === 0) return;
+  cvs.width = w; cvs.height = h;
+  const ctx = cvs.getContext('2d');
+  ctx.clearRect(0,0,w,h);
+  ctx.fillStyle = '#000'; ctx.fillRect(0,0,w,h);
+
+  const cx = w/2, cy = h*0.52, R = Math.min(w,h)*0.38;
+
+  const apex = { x: cx, y: h*0.05 };
+  ctx.beginPath();
+  ctx.moveTo(apex.x, apex.y);
+  ctx.arc(apex.x, apex.y, R*2.2, Math.PI*0.25, Math.PI*0.75);
+  ctx.closePath();
+  ctx.fillStyle = '#0c1c0c'; ctx.fill();
+
+  if (key === 'none') {
+    ctx.fillStyle = '#333'; ctx.font = `${Math.round(w*0.04)}px sans-serif`;
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText('切断面を選択すると', cx, cy - 14);
+    ctx.fillText('エコー模式図を表示', cx, cy + 14);
+    return;
+  }
+
+  if (key === 'short_axis_20' || key.startsWith('short_axis_20')) drawPSAX_AV(ctx,cx,cy,R);
+  else if (key.startsWith('short_axis_38')) drawPSAX_MV(ctx,cx,cy,R);
+  else if (key.startsWith('short_axis_60')) drawPSAX_PM(ctx,cx,cy,R);
+  else if (key.startsWith('short_axis_80')) drawPSAX_Apex(ctx,cx,cy,R);
+  else if (key === 'lateral_55') drawA4C(ctx,cx,cy,R);
+  else if (key.startsWith('long_axis') || key.startsWith('short_axis') || key.startsWith('lateral'))
+    drawGeneric(ctx,cx,cy,R, key);
+  else if (key === 'free') {
+    ctx.fillStyle = '#555'; ctx.font = `${Math.round(w*0.038)}px sans-serif`;
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText('自由切断モード', cx, cy - 12);
+    ctx.fillText('任意の断面を設定中', cx, cy + 16);
+  } else drawGeneric(ctx,cx,cy,R, key);
+}
+
+function txt(ctx, t, x, y, size, col) {
+  ctx.fillStyle = col || '#fff'; ctx.font = `${size}px sans-serif`;
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(t, x, y);
+}
+
+function drawPSAX_AV(ctx, cx, cy, R) {
+  const r = R * 0.38;
+  ctx.beginPath(); ctx.ellipse(cx - R*0.35, cy, R*0.32, R*0.38, 0, 0, Math.PI*2);
+  ctx.fillStyle = '#1a2a3a'; ctx.fill();
+  ctx.strokeStyle = '#88aacc'; ctx.lineWidth = 1.5; ctx.stroke();
+  ctx.beginPath(); ctx.ellipse(cx + R*0.35, cy + R*0.1, R*0.30, R*0.28, -0.2, 0, Math.PI*2);
+  ctx.fillStyle = '#2a1a1a'; ctx.fill();
+  ctx.strokeStyle = '#cc8888'; ctx.stroke();
+  ctx.beginPath(); ctx.arc(cx, cy - R*0.05, r, 0, Math.PI*2);
+  ctx.fillStyle = '#1a1a1a'; ctx.fill();
+  ctx.strokeStyle = '#ffcc44'; ctx.lineWidth = 2; ctx.stroke();
+  ctx.strokeStyle = '#ffcc44'; ctx.lineWidth = 1.5;
+  for (let i = 0; i < 3; i++) {
+    const a = (Math.PI * 2 / 3) * i - Math.PI / 2;
+    ctx.beginPath();
+    ctx.moveTo(cx, cy - R*0.05);
+    ctx.lineTo(cx + Math.cos(a)*r, (cy - R*0.05) + Math.sin(a)*r);
+    ctx.stroke();
+  }
+  txt(ctx, 'RVOT', cx-R*0.35, cy, Math.round(R*0.16), '#8af');
+  txt(ctx, 'LA',   cx+R*0.35, cy+R*0.1, Math.round(R*0.16), '#f88');
+  txt(ctx, 'AV',   cx, cy-R*0.4, Math.round(R*0.15), '#ffd');
+}
+
+function drawPSAX_MV(ctx, cx, cy, R) {
+  const r = R * 0.48;
+  ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI*2);
+  ctx.fillStyle = '#1a1a2a'; ctx.fill();
+  ctx.strokeStyle = '#aaaaff'; ctx.lineWidth = 2; ctx.stroke();
+  const rvOffX = R*0.55, rvOffY = -R*0.1;
+  ctx.beginPath(); ctx.arc(cx+rvOffX, cy+rvOffY, R*0.38, Math.PI*0.6, Math.PI*1.5);
+  ctx.fillStyle = '#1a2a2a'; ctx.fill();
+  ctx.strokeStyle = '#88cccc'; ctx.lineWidth = 1.5; ctx.stroke();
+  ctx.strokeStyle = '#ffd700'; ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.arc(cx, cy, r*0.55, Math.PI*1.1, Math.PI*1.9); ctx.stroke();
+  ctx.beginPath(); ctx.arc(cx, cy, r*0.55, Math.PI*0.1, Math.PI*0.9); ctx.stroke();
+  txt(ctx, 'LV', cx, cy + R*0.05, Math.round(R*0.16), '#aaf');
+  txt(ctx, 'RV', cx+rvOffX+R*0.05, cy+rvOffY, Math.round(R*0.15), '#8cc');
+  txt(ctx, 'MV', cx, cy - R*0.52, Math.round(R*0.15), '#ffd700');
+}
+
+function drawPSAX_PM(ctx, cx, cy, R) {
+  const r = R * 0.46;
+  ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI*2);
+  ctx.fillStyle = '#1a1a2a'; ctx.fill();
+  ctx.strokeStyle = '#aaaaff'; ctx.lineWidth = 2; ctx.stroke();
+  ctx.beginPath(); ctx.arc(cx+R*0.55, cy-R*0.1, R*0.36, Math.PI*0.6, Math.PI*1.5);
+  ctx.fillStyle = '#1a2a2a'; ctx.fill(); ctx.strokeStyle = '#88cccc'; ctx.stroke();
+  const pm1 = { x: cx + r*0.42, y: cy + r*0.38 };
+  const pm2 = { x: cx - r*0.42, y: cy + r*0.38 };
+  [pm1, pm2].forEach(p => {
+    ctx.beginPath(); ctx.arc(p.x, p.y, R*0.1, 0, Math.PI*2);
+    ctx.fillStyle = '#dda080'; ctx.fill();
+    ctx.strokeStyle = '#ffaa66'; ctx.lineWidth = 1.5; ctx.stroke();
+  });
+  txt(ctx, 'LV', cx, cy - R*0.1, Math.round(R*0.16), '#aaf');
+  txt(ctx, 'RV', cx+R*0.6, cy-R*0.1, Math.round(R*0.15), '#8cc');
+  txt(ctx, 'APM', pm1.x, pm1.y + R*0.17, Math.round(R*0.13), '#faa');
+  txt(ctx, 'PPM', pm2.x, pm2.y + R*0.17, Math.round(R*0.13), '#faa');
+}
+
+function drawPSAX_Apex(ctx, cx, cy, R) {
+  const r = R * 0.22;
+  ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI*2);
+  ctx.fillStyle = '#1a1a2a'; ctx.fill();
+  ctx.strokeStyle = '#aaaaff'; ctx.lineWidth = 2; ctx.stroke();
+  ctx.beginPath(); ctx.arc(cx+r*1.4, cy-r*0.2, r*0.55, Math.PI*0.5, Math.PI*1.5);
+  ctx.fillStyle = '#1a2a2a'; ctx.fill(); ctx.strokeStyle = '#88cccc'; ctx.stroke();
+  txt(ctx, 'LV 心尖部', cx, cy, Math.round(R*0.15), '#aaf');
+}
+
+function drawA4C(ctx, cx, cy, R) {
+  // Apical 4-chamber: LV/RV 下段, LA/RA 上段
+  const sepX = cx, sepMidY = cy - R*0.08;
+  // LV (bottom-left)
+  ctx.beginPath();
+  ctx.moveTo(sepX, sepMidY);
+  ctx.bezierCurveTo(sepX-R*0.05, cy+R*0.3, cx-R*0.55, cy+R*0.6, cx-R*0.05, cy+R*0.85);
+  ctx.bezierCurveTo(cx+R*0.35, cy+R*0.6, cx+R*0.05, cy+R*0.3, sepX, sepMidY);
+  ctx.fillStyle = '#2a0808'; ctx.fill();
+  ctx.strokeStyle = '#ff7777'; ctx.lineWidth = 2; ctx.stroke();
+  // RV (bottom-right, flatter)
+  ctx.beginPath();
+  ctx.moveTo(sepX, sepMidY);
+  ctx.bezierCurveTo(sepX+R*0.1, cy+R*0.25, cx+R*0.6, cy+R*0.4, cx+R*0.6, cy+R*0.55);
+  ctx.bezierCurveTo(cx+R*0.3, cy+R*0.7, cx+R*0.1, cy+R*0.75, cx-R*0.05, cy+R*0.85);
+  ctx.bezierCurveTo(cx+R*0.05, cy+R*0.3, sepX+R*0.05, cy+R*0.15, sepX, sepMidY);
+  ctx.fillStyle = '#0a1a2a'; ctx.fill();
+  ctx.strokeStyle = '#7799ff'; ctx.lineWidth = 2; ctx.stroke();
+  // IVS line
+  ctx.beginPath(); ctx.moveTo(sepX, sepMidY); ctx.lineTo(cx-R*0.05, cy+R*0.85);
+  ctx.strokeStyle = '#ffaa44'; ctx.lineWidth = 1.5; ctx.stroke();
+  // LA (top-left)
+  ctx.beginPath();
+  ctx.moveTo(sepX, sepMidY);
+  ctx.bezierCurveTo(sepX-R*0.3, cy-R*0.3, cx-R*0.65, cy-R*0.3, cx-R*0.55, cy-R*0.0);
+  ctx.bezierCurveTo(cx-R*0.45, cy+R*0.1, cx-R*0.2, cy+R*0.08, sepX, sepMidY);
+  ctx.fillStyle = '#1a0808'; ctx.fill();
+  ctx.strokeStyle = '#ff5555'; ctx.lineWidth = 1.5; ctx.stroke();
+  // RA (top-right)
+  ctx.beginPath();
+  ctx.moveTo(sepX, sepMidY);
+  ctx.bezierCurveTo(sepX+R*0.2, cy+R*0.08, cx+R*0.45, cy+R*0.1, cx+R*0.55, cy-R*0.05);
+  ctx.bezierCurveTo(cx+R*0.6, cy-R*0.35, sepX+R*0.3, cy-R*0.35, sepX, sepMidY);
+  ctx.fillStyle = '#080a1a'; ctx.fill();
+  ctx.strokeStyle = '#5566ff'; ctx.lineWidth = 1.5; ctx.stroke();
+  // IAS line
+  ctx.beginPath(); ctx.moveTo(sepX, sepMidY); ctx.lineTo(sepX, cy-R*0.35);
+  ctx.strokeStyle = '#ffaa44'; ctx.lineWidth = 1; ctx.setLineDash([3,3]);
+  ctx.stroke(); ctx.setLineDash([]);
+  // MV / TV marks
+  txt(ctx,'MV', cx-R*0.12, sepMidY+R*0.05, Math.round(R*0.12), '#ffd060');
+  txt(ctx,'TV', cx+R*0.14, sepMidY+R*0.05, Math.round(R*0.12), '#ffd060');
+  // Labels
+  txt(ctx,'LV', cx-R*0.28, cy+R*0.55, Math.round(R*0.16), '#ff9999');
+  txt(ctx,'RV', cx+R*0.38, cy+R*0.55, Math.round(R*0.14), '#8899ff');
+  txt(ctx,'LA', cx-R*0.38, cy-R*0.1,  Math.round(R*0.14), '#ff6666');
+  txt(ctx,'RA', cx+R*0.4,  cy-R*0.1,  Math.round(R*0.14), '#6677ff');
+  txt(ctx,'A4C 相当', cx, cy-R*0.6, Math.round(R*0.14), '#aaa');
+}
+
+function drawGeneric(ctx, cx, cy, R, key) {
+  ctx.fillStyle = '#333'; ctx.font = `${Math.round(R*0.22)}px sans-serif`;
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText(key.replace(/_/g,' '), cx, cy);
+}
+
+// ── UI イベント ───────────────────────────────────────────────
+
+// 切断 ON/OFF
+document.getElementById('clipToggle').addEventListener('click', () => {
+  clipEnabled = !clipEnabled;
+  const btn = document.getElementById('clipToggle');
+  btn.textContent = `断面切断: ${clipEnabled ? 'ON' : 'OFF'}`;
+  btn.className   = `clip-toggle ${clipEnabled ? 'on' : 'off'}`;
+  document.getElementById('clip-sub').style.display = clipEnabled ? 'block' : 'none';
+  if (!clipEnabled) {
+    clipPlane.set(new THREE.Vector3(0,0,-1), 1e5);
+    discMesh.visible = borderMesh.visible = false;
+  } else {
+    updatePresetClip();
+  }
+  updateEchoLabel();
+});
+
+// モード切替（プリセット3種のみ）
+document.querySelectorAll('.modeBtn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    clipMode = btn.dataset.m;
+    document.querySelectorAll('.modeBtn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('clipSlider').value = 0;
+    sliderPct = 0; updateSliderLbl();
+    buildPresetGrid();
+    if (clipEnabled) updatePresetClip();
+    updateEchoLabel();
+  });
+});
+
+// スライダー
+document.getElementById('clipSlider').addEventListener('input', e => {
+  sliderPct = parseInt(e.target.value);
+  updateSliderLbl(); updatePresetClip(); updateEchoLabel();
+});
+
+// 自由切断: idle → positioning
+document.getElementById('enterFreeCutBtn').addEventListener('click', () => {
+  enterPositioning();
+});
+
+// 自由切断: positioning モード切替
+document.getElementById('xTransBtn').addEventListener('click', () => {
+  xCtrl.setMode('translate');
+  document.getElementById('xTransBtn').classList.add('active');
+  document.getElementById('xRotBtn').classList.remove('active');
+});
+document.getElementById('xRotBtn').addEventListener('click', () => {
+  xCtrl.setMode('rotate');
+  document.getElementById('xRotBtn').classList.add('active');
+  document.getElementById('xTransBtn').classList.remove('active');
+});
+
+// 軸リセット
+document.getElementById('freeReset-Z').addEventListener('click', () => {
+  if (!modelBox) return;
+  const mc = new THREE.Vector3(); modelBox.getCenter(mc);
+  pivot.position.copy(mc); pivot.quaternion.identity();
+  updateFreeDisc();
+});
+document.getElementById('freeReset-Y').addEventListener('click', () => {
+  if (!modelBox) return;
+  const mc = new THREE.Vector3(); modelBox.getCenter(mc);
+  pivot.position.copy(mc); pivot.quaternion.identity();
+  pivot.quaternion.setFromAxisAngle(new THREE.Vector3(1,0,0), Math.PI/2);
+  updateFreeDisc();
+});
+document.getElementById('freeReset-X').addEventListener('click', () => {
+  if (!modelBox) return;
+  const mc = new THREE.Vector3(); modelBox.getCenter(mc);
+  pivot.position.copy(mc); pivot.quaternion.identity();
+  pivot.quaternion.setFromAxisAngle(new THREE.Vector3(0,1,0), Math.PI/2);
+  updateFreeDisc();
+});
+document.getElementById('freeReset-C').addEventListener('click', () => {
+  if (!modelBox) return;
+  const mc = new THREE.Vector3(); modelBox.getCenter(mc);
+  pivot.position.copy(mc); pivot.quaternion.identity();
+  updateFreeDisc();
+});
+
+// 切断を実行
+document.getElementById('executeCutBtn').addEventListener('click', () => {
+  executeCut();
+});
+
+// キャンセル
+document.getElementById('cancelFreeCutBtn').addEventListener('click', () => {
+  cancelPositioning();
+});
+
+// 切断面を再設定
+document.getElementById('resetPositioningBtn').addEventListener('click', () => {
+  resetToPositioning();
+});
+
+// 初期状態に戻す
+document.getElementById('fullResetBtn').addEventListener('click', () => {
+  fullReset();
+});
+
+// エコーパネル
+function toggleEchoPanel(show) {
+  const ep = document.getElementById('echo-panel');
+  if (show === undefined) show = ep.classList.contains('hidden');
+  ep.classList.toggle('hidden', !show);
+  document.getElementById('echoToggle').classList.toggle('on', show);
+  resizeViewport();
+  if (show) { updateEchoLabel(); }
+}
+document.getElementById('echoToggle').addEventListener('click', () => toggleEchoPanel());
+document.getElementById('echoClose').addEventListener('click',  () => toggleEchoPanel(false));
+
+// 画像・動画アップロード
+document.getElementById('uploadBtn').addEventListener('click', () => {
+  document.getElementById('uploadInput').click();
+});
+document.getElementById('uploadInput').addEventListener('change', e => {
+  const f = e.target.files[0]; if (!f) return;
+  const url = URL.createObjectURL(f);
+  if (f.type.startsWith('video/')) {
+    echoImg.style.display = 'none';
+    echoVid.src = url; echoVid.style.display = 'block';
+    echoCvs.style.display = 'none';
+  } else {
+    echoVid.style.display = 'none';
+    echoImg.src = url; echoImg.style.display = 'block';
+    echoCvs.style.display = 'none';
+  }
+  showingSchematic = false;
+});
+
+document.getElementById('schematicBtn').addEventListener('click', () => {
+  echoImg.style.display = 'none';
+  echoVid.style.display = 'none';
+  echoCvs.style.display = 'block';
+  showingSchematic = true;
+  drawSchematic(currentSchematicKey);
+});
+
+document.getElementById('clearBtn').addEventListener('click', () => {
+  echoImg.style.display = 'none';
+  echoVid.style.display = 'none';
+  echoCvs.style.display = 'block';
+  showingSchematic = true;
+  currentSchematicKey = 'none';
+  drawSchematic('none');
+});
+
+// キーボードショートカット
+window.addEventListener('keydown', e => {
+  if (['INPUT','TEXTAREA'].includes(e.target.tagName)) return;
+  if (e.key === 'r' || e.key === 'R') {
+    camera.position.copy(initPos); orbit.target.copy(initTgt); orbit.update();
+  }
+  if (e.key === 'c' || e.key === 'C') document.getElementById('clipToggle').click();
+  if (e.key === 'e' || e.key === 'E') toggleEchoPanel();
+});
+
+// ── 初期状態設定 ──────────────────────────────────────────────
+setFreeCutState('idle');
+
+// ── Render loop ───────────────────────────────────────────────
+(function animate() {
+  requestAnimationFrame(animate);
+  orbit.update();
+  renderer.render(scene, camera);
+})();
+
+resizeViewport();
+</script>
+</body>
+</html>

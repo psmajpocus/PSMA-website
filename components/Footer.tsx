@@ -4,88 +4,116 @@ import Link from 'next/link';
 import { useLang } from '@/lib/LangContext';
 
 export default function Footer() {
-  const { t } = useLang();
+  const { lang } = useLang();
 
   const navLinks = [
-    { href: '/', label: t('nav.home') },
-    { href: '/about', label: t('nav.about') },
-    { href: '/activities', label: t('nav.activities') },
-    { href: '/articles', label: t('nav.articles') },
-    { href: '/members', label: t('nav.members') },
-    { href: '/contact', label: t('nav.contact') },
+    { href: '/',           label_ja: 'ホーム',     label_en: 'Home' },
+    { href: '/about',      label_ja: '団体紹介',   label_en: 'About' },
+    { href: '/activities', label_ja: 'イベント',   label_en: 'Events' },
+    { href: '/articles',   label_ja: '特集記事',   label_en: 'Articles' },
+    { href: '/members',    label_ja: 'メンバー',   label_en: 'Members' },
+    { href: '/contact',    label_ja: '参加・お問い合わせ',   label_en: 'Join / Contact' },
+  ];
+
+  const socialLinks = [
+    { href: '#', label: 'Instagram' },
+    { href: '#', label: 'X (Twitter)' },
+    { href: '#', label: 'Facebook' },
   ];
 
   return (
-    <footer className="bg-slate-950 text-white">
-      <div className="max-w-7xl mx-auto px-6 lg:px-8 py-16">
-        {/* Top row */}
-        <div className="flex flex-col md:flex-row justify-between gap-12 pb-12 border-b border-slate-800">
-          {/* Brand */}
-          <div className="max-w-xs">
-            <div className="flex items-center gap-3 mb-5">
-              <span className="text-[11px] font-bold tracking-[0.2em] text-white bg-slate-700 px-2 py-1">
+    <footer style={{ backgroundColor: '#020826' }} className="text-white">
+
+      {/* ── Layer 2: Main Footer Content ──────────────────────── */}
+      <div className="max-w-7xl mx-auto px-6 lg:px-12 py-20 border-b border-white/[0.07]">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-14 lg:gap-28">
+
+          {/* Column 1: Brand */}
+          <div>
+            <div className="flex items-center gap-3 mb-4">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/images/psma-logo.png"
+                alt="PSMA logo"
+                style={{ height: '52px', width: 'auto' }}
+              />
+              <p className="text-[40px] font-bold leading-snug text-white">
                 PSMA
-              </span>
+              </p>
             </div>
-            <p className="text-[12px] text-slate-400 leading-relaxed tracking-wide uppercase">
-              POCUS Students and<br />Residents Medical Alliance
+            <p className="text-[13px] tracking-[0.2em] uppercase text-blue-400/50 font-medium leading-relaxed mb-5">
+              POCUS Students &amp;<br />Residents Medical Alliance
             </p>
-            <p className="text-[12px] text-slate-500 mt-3 leading-relaxed">
-              {t('footer.description')}
+            <p className="text-slate-500 text-[13px] leading-relaxed">
+              {lang === 'ja'
+                ? '日本ポイントオブケア超音波学会　学生・研修医部会'
+                : 'Student and Resident Division of the Japanese Society of Point-of-Care Ultrasound'}
             </p>
           </div>
 
-          {/* Nav */}
+          {/* Column 2: Navigation */}
           <div>
-            <p className="text-[10px] tracking-[0.2em] uppercase text-slate-500 mb-5 font-medium">
-              {t('footer.links_title')}
+            <p className="text-[10px] tracking-[0.3em] uppercase text-slate-600 font-medium mb-8">
+              Navigation
             </p>
-            <ul className="space-y-3">
+            <ul className="space-y-[14px]">
               {navLinks.map((link) => (
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-[12px] tracking-widest uppercase text-slate-400 hover:text-white transition-colors font-medium"
+                    className="text-[17px] text-slate-400 hover:text-white transition-colors duration-200 font-medium"
                   >
-                    {link.label}
+                    {lang === 'ja' ? link.label_ja : link.label_en}
                   </Link>
                 </li>
               ))}
             </ul>
           </div>
 
-          {/* Contact */}
+          {/* Column 3: Community / Contact */}
           <div>
-            <p className="text-[10px] tracking-[0.2em] uppercase text-slate-500 mb-5 font-medium">
-              {t('footer.contact_title')}
+            <p className="text-[10px] tracking-[0.3em] uppercase text-slate-600 font-medium mb-8">
+              Community
             </p>
-            <a
-              href="mailto:moriyankoyuto0430@gmail.com"
-              className="text-[12px] text-slate-400 hover:text-white transition-colors"
-            >
-              moriyankoyuto0430@gmail.com
-            </a>
-            <div className="mt-4">
-              <Link
-                href="/contact"
-                className="inline-block text-[11px] tracking-widest uppercase font-medium border border-slate-700 hover:border-white text-slate-400 hover:text-white px-4 py-2 transition-colors"
-              >
-                {t('nav.contact')} →
-              </Link>
-            </div>
+            <ul className="space-y-[14px]">
+              {socialLinks.map((link) => (
+                <li key={link.label}>
+                  <a
+                    href={link.href}
+                    className="text-[17px] text-slate-400 hover:text-white transition-colors duration-200 font-medium"
+                  >
+                    {link.label}
+                  </a>
+                </li>
+              ))}
+              <li className="pt-3 border-t border-white/[0.06]">
+                <a
+                  href="mailto:psma.jpocus@gmail.com"
+                  className="text-[17px] text-slate-500 hover:text-white transition-colors duration-200"
+                >
+                  psma.jpocus@gmail.com
+                </a>
+              </li>
+            </ul>
           </div>
         </div>
+      </div>
 
-        {/* Bottom row */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 pt-8">
-          <p className="text-[11px] text-slate-600 tracking-wide">
-            © {new Date().getFullYear()} PSMA. {t('footer.rights')}
-          </p>
-          <p className="text-[11px] text-slate-600 tracking-widest uppercase">
+      {/* ── Layer 3: Bottom Bar ────────────────────────────────── */}
+      <div className="max-w-7xl mx-auto px-6 lg:px-12 py-7">
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
+          <span className="text-[11px] text-slate-700 tracking-wide">
+            © {new Date().getFullYear()} PSMA. All rights reserved.
+          </span>
+          <span className="text-[11px] text-slate-700 tracking-[0.2em] uppercase">
             Founded 2024 · Tokyo, Japan
-          </p>
+          </span>
+          <span className="text-[11px] text-slate-700 tracking-wide">
+            Built by Students for Future Clinicians
+          </span>
         </div>
       </div>
+
     </footer>
   );
 }
